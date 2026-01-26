@@ -145,13 +145,51 @@ export default function AIQuestionGenerator({
               id="file-upload"
             />
             <label htmlFor="file-upload" className="cursor-pointer">
-              <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
               {file ? (
-                <p className="text-green-600 font-medium">{file.name}</p>
+                <div className="flex items-center justify-center space-x-3">
+                  {/* File Type Icon */}
+                  {file.name.endsWith('.pdf') && (
+                    <svg className="w-12 h-12 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18.5,9H13V3.5L18.5,9M6,20V4H12V10H18V20H6M10.1,11.4C10.08,11.44 9.81,13.16 8,16.09C8,16.09 4.5,17.91 5.33,19.27C6,20.35 7.65,19.23 9.07,16.59C9.07,16.59 10.89,15.95 13.31,15.77C13.31,15.77 17.17,17.5 17.7,15.66C18.22,13.8 14.64,14.22 14,14.41C14,14.41 12,13.06 11.5,11.2C11.5,11.2 12.64,7.25 10.89,7.3C9.14,7.35 9.8,10.43 10.1,11.4M10.91,12.44C10.94,12.45 11.38,13.65 12.8,14.9C12.8,14.9 10.47,15.36 9.41,15.8C9.41,15.8 10.41,14.07 10.91,12.44M14.84,15.16C15.42,15 17.17,15.31 17.1,15.64C17.04,15.97 14.84,15.16 14.84,15.16M7.77,17C7.24,18.24 6.33,19.2 6.1,19C5.87,18.8 6.8,17.39 7.77,17M10.91,10.07C10.91,10 10.55,7.87 10.91,7.92C11.45,8 10.91,10 10.91,10.07Z" />
+                    </svg>
+                  )}
+                  {(file.name.endsWith('.doc') || file.name.endsWith('.docx')) && (
+                    <svg className="w-12 h-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M15.2,10H14.8L14,14.8L13,10H11.5L10.5,14.8L9.8,10H9.3L10.3,16H11.3L12.3,12.3L13.3,16H14.3L15.2,10Z" />
+                    </svg>
+                  )}
+                  {(file.name.endsWith('.ppt') || file.name.endsWith('.pptx')) && (
+                    <svg className="w-12 h-12 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M15,11H13V13H15C15.6,13 16,12.6 16,12C16,11.4 15.6,11 15,11M14,14H10V9H14C15.1,9 16,9.9 16,11V12C16,13.1 15.1,14 14,14Z" />
+                    </svg>
+                  )}
+                  {file.name.endsWith('.txt') && (
+                    <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H12V18H13C13.6,18 14,17.6 14,17V15C14,14.4 13.6,14 13,14H10V19M12,16H11V15H12V16Z" />
+                    </svg>
+                  )}
+                  <div className="text-left">
+                    <p className="text-green-600 font-medium">{file.name}</p>
+                    <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFile(null);
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               ) : (
                 <>
+                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
                   <p className="text-gray-600 font-medium">Click to upload or drag and drop</p>
                   <p className="text-sm text-gray-500 mt-1">PDF, Word, PowerPoint, or Text files</p>
                 </>

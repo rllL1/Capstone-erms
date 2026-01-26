@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { approveExamination, rejectExamination } from './actions';
-import type { Examination } from '@/types/assessment';
 
 interface ApprovalActionsProps {
-  examination: Examination;
+  examination: {
+    id: string;
+    status: string;
+    rejection_reason?: string;
+  };
 }
 
 export default function ApprovalActions({ examination }: ApprovalActionsProps) {

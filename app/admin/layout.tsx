@@ -24,8 +24,13 @@ import PeopleIcon from '@mui/icons-material/People';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import HomeIcon from '@mui/icons-material/Home';
+import GroupIcon from '@mui/icons-material/Group';
+import DescriptionIcon from '@mui/icons-material/Description';
+import SchoolIcon from '@mui/icons-material/School';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const drawerWidth = 260;
 
@@ -66,7 +71,8 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: '#8B5CF6',
+  backgroundColor: '#FFFFFF',
+  color: '#111827',
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -182,9 +188,10 @@ export default function AdminLayout({
   };
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
-    { text: 'Teacher', icon: <PeopleIcon />, path: '/admin/teacher' },
-    { text: 'Assessment', icon: <AssignmentIcon />, path: '/admin/assessment' },
+    { text: 'Dashboard', icon: <HomeIcon />, path: '/admin/dashboard' },
+    { text: 'Teacher', icon: <GroupIcon />, path: '/admin/teacher' },
+    { text: 'Assessment', icon: <DescriptionIcon />, path: '/admin/assessment' },
+    { text: 'Students', icon: <SchoolIcon />, path: '/admin/students' },
   ];
 
   if (!mounted || loading) {
@@ -205,32 +212,27 @@ export default function AdminLayout({
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            ERMS - Admin Portal
-          </Typography>
-          <Avatar sx={{ bgcolor: '#A78BFA' }}>
-            {profile?.fullname?.charAt(0).toUpperCase() || 'A'}
-          </Avatar>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#111827' }}>
+                System Administrator
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#6B7280' }}>
+                Administrator
+              </Typography>
+            </Box>
+            <Avatar sx={{ bgcolor: '#8B5CF6' }}>
+              {profile?.fullname?.charAt(0).toUpperCase() || 'A'}
+            </Avatar>
+          </Box>
         </Toolbar>
       </AppBar>
 
       <Drawer variant="permanent" open={open}>
-        <DrawerHeader sx={{ bgcolor: '#FFFFFF', justifyContent: 'space-between', px: 2, borderBottom: '1px solid #E5E7EB' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, opacity: open ? 1 : 0, transition: 'opacity 0.3s' }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                bgcolor: '#8B5CF6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <AdminPanelSettingsIcon sx={{ color: 'white' }} />
-            </Box>
-            <Box>
+        <DrawerHeader sx={{ bgcolor: '#FFFFFF', justifyContent: 'space-between', px: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1, opacity: open ? 1 : 0, transition: 'opacity 0.3s' }}>
+            <Box sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2, color: '#111827' }}>
                 ERMS
               </Typography>
@@ -244,9 +246,7 @@ export default function AdminLayout({
           </IconButton>
         </DrawerHeader>
 
-        <Divider sx={{ bgcolor: '#E5E7EB' }} />
-
-        <List sx={{ px: open ? 2 : 1, py: 2 }}>
+        <List sx={{ px: open ? 1.5 : 0.5, py: 2, mt: 4 }}>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding sx={{ display: 'block', mb: 0.5 }}>
               <Link href={item.path} style={{ textDecoration: 'none' }}>
@@ -309,35 +309,11 @@ export default function AdminLayout({
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Divider sx={{ bgcolor: '#E5E7EB' }} />
-
         <Box sx={{ p: open ? 2 : 1 }}>
-          {open && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                mb: 2,
-                p: 1.5,
-                borderRadius: 2,
-                bgcolor: '#F9FAFB',
-                border: '1px solid #E5E7EB',
-              }}
-            >
-              <Avatar sx={{ bgcolor: '#8B5CF6', width: 40, height: 40 }}>
-                {profile?.fullname?.charAt(0).toUpperCase() || 'A'}
-              </Avatar>
-              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Typography variant="body2" noWrap sx={{ fontWeight: 600, color: '#111827' }}>
-                  {profile?.fullname || 'Admin'}
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#6B7280' }}>
-                  Administrator
-                </Typography>
-              </Box>
-            </Box>
-          )}
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: open ? 2 : 1, mb: 2, flexDirection: open ? 'row' : 'column' }}>
+            <Image src="/2-re.png" alt="Logo 1" width={open ? 50 : 40} height={open ? 50 : 40} style={{ borderRadius: '8px' }} />
+            <Image src="/234.png" alt="Logo 2" width={open ? 50 : 40} height={open ? 50 : 40} style={{ borderRadius: '8px' }} />
+          </Box>
 
           <ListItemButton
             onClick={handleLogout}
@@ -345,13 +321,17 @@ export default function AdminLayout({
               {
                 minHeight: 48,
                 borderRadius: 2,
-                color: '#6B7280',
+                bgcolor: '#DC2626',
+                color: '#FFFFFF',
                 '&:hover': {
-                  bgcolor: '#FEE2E2',
-                  color: '#DC2626',
+                  bgcolor: '#B91C1C',
+                  color: '#FFFFFF',
                   '& .MuiListItemIcon-root': {
-                    color: '#DC2626',
+                    color: '#FFFFFF',
                   },
+                },
+                '& .MuiListItemIcon-root': {
+                  color: '#FFFFFF',
                 },
               },
               open
@@ -370,7 +350,6 @@ export default function AdminLayout({
                 {
                   minWidth: 0,
                   justifyContent: 'center',
-                  color: '#9CA3AF',
                 },
                 open
                   ? {

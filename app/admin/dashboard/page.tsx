@@ -60,9 +60,9 @@ export default async function AdminDashboard() {
               <p className="text-sm font-medium text-gray-500">Total Teachers</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalTeachers}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
               <svg
-                className="w-6 h-6 text-purple-600"
+                className="w-6 h-6 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -83,11 +83,11 @@ export default async function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">Active Teachers</p>
-              <p className="text-3xl font-bold text-purple-600 mt-2">{stats.activeTeachers}</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{stats.activeTeachers}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
               <svg
-                className="w-6 h-6 text-purple-600"
+                className="w-6 h-6 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -144,8 +144,8 @@ export default async function AdminDashboard() {
             recentActivity.map((teacher) => (
               <div key={teacher.id} className="p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                    <span className="text-purple-600 font-medium">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <span className="text-green-600 font-medium">
                       {teacher.fullname?.charAt(0).toUpperCase() || 'T'}
                     </span>
                   </div>
@@ -160,7 +160,7 @@ export default async function AdminDashboard() {
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       teacher.status === 'active'
-                        ? 'bg-purple-100 text-purple-700'
+                        ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-600'
                     }`}
                   >

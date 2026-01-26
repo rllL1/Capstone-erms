@@ -1,35 +1,48 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import ApprovalActions from './ApprovalActions';
 
 export default async function AdminAssessmentPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Fetch all assessments
-  const { data: assessments } = await supabase
+  const { data: assessments, error: assessmentsError } = await supabase
     .from('assessments')
-    .select(`
-      *,
-      teacher:profiles!assessments_teacher_id_fkey(fullname, email)
-    `)
+    .select('*')
     .order('created_at', { ascending: false });
 
   // Fetch all examinations
-  const { data: examinations } = await supabase
+  const { data: examinations, error: examinationsError } = await supabase
     .from('examinations')
-    .select(`
-      *,
-      teacher:profiles!examinations_teacher_id_fkey(fullname, email)
-    `)
+    .select('*')
     .order('created_at', { ascending: false });
 
-  const allAssessments = assessments || [];
-  const allExams = examinations || [];
+  // Fetch all teacher profiles
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, fullname, email, role')
+    .eq('role', 'teacher');
+
+  // Create a map of teacher profiles for easy lookup
+  const teacherMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+  // Enrich assessments with teacher info
+  const allAssessments = (assessments || []).map(assessment => ({
+    ...assessment,
+    teacher: teacherMap.get(assessment.teacher_id)
+  }));
+
+  // Enrich examinations with teacher info
+  const allExams = (examinations || []).map(exam => ({
+    ...exam,
+    teacher: teacherMap.get(exam.teacher_id)
+  }));
 
   // Stats
   const totalItems = allAssessments.length + allExams.length;
   const pendingExams = allExams.filter((e) => e.status === 'pending').length;
   const approvedExams = allExams.filter((e) => e.status === 'approved').length;
   const rejectedExams = allExams.filter((e) => e.status === 'rejected').length;
+  const publishedAssessments = allAssessments.filter((a) => a.status === 'published').length;
 
   return (
     <div>
@@ -99,7 +112,7 @@ export default async function AdminAssessmentPage() {
         </div>
       </div>
 
-      {/* Pending Examinations */}
+      {/* Pending Examinations Alert */}
       {pendingExams > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
           <div className="flex items-start">
@@ -118,10 +131,11 @@ export default async function AdminAssessmentPage() {
         </div>
       )}
 
-      {/* Examinations Requiring Approval */}
+      {/* Examinations (Require Approval) */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">Examinations (Require Approval)</h2>
+          <p className="text-sm text-gray-500 mt-1">Prelim, Midterm, and Finals examinations require admin approval</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -197,11 +211,11 @@ export default async function AdminAssessmentPage() {
         </div>
       </div>
 
-      {/* Assessments (Auto-approved) */}
+      {/* Assessments (Auto-approved - Monitoring) */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">Assessments (Auto-approved)</h2>
-          <p className="text-sm text-gray-500 mt-1">Quizzes and assignments created by teachers</p>
+          <p className="text-sm text-gray-500 mt-1">Quizzes and assignments are automatically published - monitoring only</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -240,8 +254,8 @@ export default async function AdminAssessmentPage() {
                       {assessment.questions.length} questions
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {assessment.status}
+                      <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        PUBLISHED
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

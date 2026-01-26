@@ -6,7 +6,6 @@ import Link from 'next/link';
 import ManualQuestionBuilder from '../../assessment/create/ManualQuestionBuilder';
 import AIQuestionGenerator from '../../assessment/create/AIQuestionGenerator';
 import AssessmentSettingsForm from '../../assessment/create/AssessmentSettingsForm';
-import TermsAndConditionsModal from '../../assessment/create/TermsAndConditionsModal';
 import { createExamination } from './actions';
 import type { Question, AssessmentSettings, ExamType } from '@/types/assessment';
 
@@ -23,7 +22,6 @@ export default function CreateExaminationPage() {
     availableFrom: '',
     availableUntil: '',
   });
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Basic info
@@ -41,13 +39,8 @@ export default function CreateExaminationPage() {
     setStep(3);
   };
 
-  const handleSettingsComplete = (newSettings: AssessmentSettings) => {
+  const handleSettingsComplete = async (newSettings: AssessmentSettings) => {
     setSettings(newSettings);
-    setShowTermsModal(true);
-  };
-
-  const handleTermsAccept = async () => {
-    setShowTermsModal(false);
     setIsSaving(true);
 
     try {
@@ -59,7 +52,7 @@ export default function CreateExaminationPage() {
         year_level: yearLevel,
         semester,
         questions,
-        settings,
+        settings: newSettings,
         terms_accepted: true,
         generation_method: creationMethod || 'manual',
       });
@@ -349,15 +342,6 @@ export default function CreateExaminationPage() {
           totalPoints={settings.totalPoints}
           onComplete={handleSettingsComplete}
           onBack={() => setStep(2)}
-        />
-      )}
-
-      {/* Terms and Conditions Modal */}
-      {showTermsModal && (
-        <TermsAndConditionsModal
-          onAccept={handleTermsAccept}
-          onDecline={() => setShowTermsModal(false)}
-          isSaving={isSaving}
         />
       )}
     </div>

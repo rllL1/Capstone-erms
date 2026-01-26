@@ -6,7 +6,6 @@ import Link from 'next/link';
 import ManualQuestionBuilder from './ManualQuestionBuilder';
 import AIQuestionGenerator from './AIQuestionGenerator';
 import AssessmentSettingsForm from './AssessmentSettingsForm';
-import TermsAndConditionsModal from './TermsAndConditionsModal';
 import { createAssessment } from './actions';
 import type { Question, AssessmentSettings } from '@/types/assessment';
 
@@ -23,7 +22,6 @@ export default function CreateAssessmentPage() {
     availableFrom: '',
     availableUntil: '',
   });
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Basic info
@@ -39,13 +37,8 @@ export default function CreateAssessmentPage() {
     setStep(3);
   };
 
-  const handleSettingsComplete = (newSettings: AssessmentSettings) => {
+  const handleSettingsComplete = async (newSettings: AssessmentSettings) => {
     setSettings(newSettings);
-    setShowTermsModal(true);
-  };
-
-  const handleTermsAccept = async () => {
-    setShowTermsModal(false);
     setIsSaving(true);
 
     try {
@@ -55,7 +48,7 @@ export default function CreateAssessmentPage() {
         subject,
         grade_level: gradeLevel,
         questions,
-        settings,
+        settings: newSettings,
         terms_accepted: true,
         generation_method: creationMethod || 'manual',
       });
@@ -77,44 +70,23 @@ export default function CreateAssessmentPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Progress Steps */}
+      {/* Back Button */}
+      <div className="mb-6">
+        <Link
+          href="/teacher/assessment"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Assessments
+        </Link>
+      </div>
+
+      {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex items-center flex-1">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
-                  step >= s
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}
-              >
-                {s}
-              </div>
-              {s < 4 && (
-                <div
-                  className={`h-1 flex-1 mx-2 ${
-                    step > s ? 'bg-green-600' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between mt-2 text-sm">
-          <span className={step >= 1 ? 'text-gray-900 font-medium' : 'text-gray-500'}>
-            Basic Info
-          </span>
-          <span className={step >= 2 ? 'text-gray-900 font-medium' : 'text-gray-500'}>
-            Questions
-          </span>
-          <span className={step >= 3 ? 'text-gray-900 font-medium' : 'text-gray-500'}>
-            Settings
-          </span>
-          <span className={step >= 4 ? 'text-gray-900 font-medium' : 'text-gray-500'}>
-            Review
-          </span>
-        </div>
+        <h1 className="text-3xl font-bold text-gray-900">Create New Assessment</h1>
+        <p className="text-gray-600 mt-2">Follow the steps to create a new assessment</p>
       </div>
 
       {/* Step 1: Basic Information */}
@@ -192,7 +164,7 @@ export default function CreateAssessmentPage() {
               <button
                 onClick={() => setStep(2)}
                 disabled={!title || !subject || !gradeLevel}
-                className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-medium rounded-lg transition-colors"
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white font-medium rounded-lg transition-colors"
               >
                 Next: Choose Method
               </button>
@@ -211,11 +183,11 @@ export default function CreateAssessmentPage() {
             {/* AI Generation */}
             <button
               onClick={() => setCreationMethod('ai')}
-              className="p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all text-left group"
+              className="p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-left group"
             >
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 group-hover:bg-green-600">
+              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-4 group-hover:bg-purple-600">
                 <svg
-                  className="w-6 h-6 text-green-600 group-hover:text-white"
+                  className="w-6 h-6 text-purple-600 group-hover:text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -237,9 +209,9 @@ export default function CreateAssessmentPage() {
             {/* Manual Input */}
             <button
               onClick={() => setCreationMethod('manual')}
-              className="p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all text-left group"
+              className="p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-left group"
             >
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-green-600">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:bg-purple-600">
                 <svg
                   className="w-6 h-6 text-gray-600 group-hover:text-white"
                   fill="none"
@@ -303,15 +275,6 @@ export default function CreateAssessmentPage() {
           totalPoints={settings.totalPoints}
           onComplete={handleSettingsComplete}
           onBack={() => setStep(2)}
-        />
-      )}
-
-      {/* Terms and Conditions Modal */}
-      {showTermsModal && (
-        <TermsAndConditionsModal
-          onAccept={handleTermsAccept}
-          onDecline={() => setShowTermsModal(false)}
-          isSaving={isSaving}
         />
       )}
     </div>
