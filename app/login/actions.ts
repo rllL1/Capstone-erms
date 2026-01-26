@@ -47,6 +47,8 @@ export async function login(formData: FormData) {
   // Redirect based on role
   if (profile.role === 'admin') {
     redirect('/admin/dashboard');
+  } else if (profile.role === 'student') {
+    redirect('/student/dashboard');
   } else {
     redirect('/teacher/dashboard');
   }

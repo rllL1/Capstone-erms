@@ -177,6 +177,7 @@ export default function AdminLayout({
   const menuItems = [
     { text: 'Dashboard', icon: <HomeIcon />, path: '/admin/dashboard' },
     { text: 'Teacher', icon: <GroupIcon />, path: '/admin/teacher' },
+    { text: 'Student', icon: <SchoolIcon />, path: '/admin/student' },
     { text: 'Assessment', icon: <DescriptionIcon />, path: '/admin/assessment' },
   ];
 

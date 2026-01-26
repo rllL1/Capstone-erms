@@ -20,15 +20,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import ClassIcon from '@mui/icons-material/Class';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import SchoolIcon from '@mui/icons-material/School';
+import GradeIcon from '@mui/icons-material/Grade';
 import LogoutIcon from '@mui/icons-material/Logout';
-import HomeIcon from '@mui/icons-material/Home';
-import DescriptionIcon from '@mui/icons-material/Description';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import GroupsIcon from '@mui/icons-material/Groups';
-import PeopleIcon from '@mui/icons-material/People';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -128,7 +123,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function TeacherLayout({
+export default function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -154,17 +149,22 @@ export default function TeacherLayout({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        redirect('/login');
+        redirect('/student/login');
       }
 
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('fullname, role, department')
+        .select('fullname, role, student_id, status, profile_picture')
         .eq('id', user.id)
         .single();
 
-      if (profileData?.role !== 'teacher') {
-        redirect('/admin/dashboard');
+      if (profileData?.role !== 'student') {
+        redirect('/login');
+      }
+
+      // Check if student is approved
+      if (profileData?.status !== 'active') {
+        redirect('/student/login');
       }
 
       setProfile(profileData);
@@ -185,15 +185,14 @@ export default function TeacherLayout({
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    redirect('/login');
+    redirect('/student/login');
   };
 
   const menuItems = [
-    { text: 'Dashboard', icon: <HomeIcon />, path: '/teacher/dashboard' },
-    { text: 'Assessment', icon: <DescriptionIcon />, path: '/teacher/assessment' },
-    { text: 'Examination', icon: <MenuBookIcon />, path: '/teacher/examination' },
-    { text: 'Group', icon: <GroupsIcon />, path: '/teacher/group' },
-    { text: 'Grades', icon: <AssessmentIcon />, path: '/teacher/grades' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/student/dashboard' },
+    { text: 'Class', icon: <ClassIcon />, path: '/student/class' },
+    { text: 'Records', icon: <AssessmentIcon />, path: '/student/records' },
+    { text: 'Grades', icon: <GradeIcon />, path: '/student/grades' },
   ];
 
   if (!mounted || loading) {
@@ -218,14 +217,14 @@ export default function TeacherLayout({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, color: '#111827' }}>
-                {profile?.fullname || 'Teacher'}
+                {profile?.fullname || 'Student'}
               </Typography>
               <Typography variant="caption" sx={{ color: '#6B7280' }}>
-                {profile?.department || 'Teacher'}
+                {profile?.student_id || 'Student'}
               </Typography>
             </Box>
             <Avatar sx={{ bgcolor: '#8B5CF6' }}>
-              {profile?.fullname?.charAt(0).toUpperCase() || 'T'}
+              {profile?.fullname?.charAt(0).toUpperCase() || 'S'}
             </Avatar>
           </Box>
         </Toolbar>
@@ -239,7 +238,7 @@ export default function TeacherLayout({
                 ERMS
               </Typography>
               <Typography variant="caption" sx={{ color: '#6B7280' }}>
-                Teacher Portal
+                Student Portal
               </Typography>
             </Box>
           </Box>
@@ -248,7 +247,43 @@ export default function TeacherLayout({
           </IconButton>
         </DrawerHeader>
 
-        <List sx={{ px: open ? 1.5 : 0.5, py: 2, mt: 4 }}>
+        {/* Profile Section */}
+        <Box sx={{ 
+          px: open ? 2 : 1, 
+          py: 3, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          borderBottom: '1px solid #E5E7EB',
+        }}>
+          <Avatar 
+            sx={{ 
+              width: open ? 80 : 40, 
+              height: open ? 80 : 40, 
+              bgcolor: '#8B5CF6',
+              mb: open ? 2 : 0,
+              transition: 'all 0.3s',
+            }}
+          >
+            {profile?.fullname?.charAt(0).toUpperCase() || 'S'}
+          </Avatar>
+          {open && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 600, 
+                color: '#111827',
+                textAlign: 'center',
+                opacity: open ? 1 : 0,
+                transition: 'opacity 0.3s',
+              }}
+            >
+              {profile?.fullname}
+            </Typography>
+          )}
+        </Box>
+
+        <List sx={{ px: open ? 1.5 : 0.5, py: 2 }}>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding sx={{ display: 'block', mb: 0.5 }}>
               <Link href={item.path} style={{ textDecoration: 'none' }}>
