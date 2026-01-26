@@ -11,7 +11,6 @@ import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -19,11 +18,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import HomeIcon from '@mui/icons-material/Home';
 import GroupIcon from '@mui/icons-material/Group';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -132,20 +127,12 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = useTheme();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<{ fullname: string; role: string; department: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
     const checkAuth = async () => {
       const supabase = createClient();
       const {
@@ -171,7 +158,7 @@ export default function AdminLayout({
     };
 
     checkAuth();
-  }, [mounted]);
+  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -191,10 +178,9 @@ export default function AdminLayout({
     { text: 'Dashboard', icon: <HomeIcon />, path: '/admin/dashboard' },
     { text: 'Teacher', icon: <GroupIcon />, path: '/admin/teacher' },
     { text: 'Assessment', icon: <DescriptionIcon />, path: '/admin/assessment' },
-    { text: 'Students', icon: <SchoolIcon />, path: '/admin/students' },
   ];
 
-  if (!mounted || loading) {
+  if (loading) {
     return null;
   }
 

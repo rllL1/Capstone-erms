@@ -192,7 +192,6 @@ export default function TeacherLayout({
     { text: 'Assessment', icon: <DescriptionIcon />, path: '/teacher/assessment' },
     { text: 'Examination', icon: <MenuBookIcon />, path: '/teacher/examination' },
     { text: 'Group', icon: <GroupsIcon />, path: '/teacher/group' },
-    { text: 'Students', icon: <PeopleIcon />, path: '/teacher/students' },
   ];
 
   if (!mounted || loading) {

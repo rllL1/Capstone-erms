@@ -5,6 +5,7 @@ import { login } from './actions';
 import Modal from '@mui/material/Modal';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Link from 'next/link';
 
 export default function LoginPage({
   searchParams,
@@ -140,7 +141,7 @@ export default function LoginPage({
               </form>
 
               {/* Footer Note */}
-              <p className="mt-8 text-xs text-gray-400">
+              <p className="mt-8 text-xs text-gray-400 text-center">
                 Contact your administrator for account access
               </p>
             </div>
