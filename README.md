@@ -1,4 +1,4 @@
-# ERMS - Employee Records Management System
+# ERMS - Exam Records Management System
 
 A full-stack, role-based administrative system built with Next.js (App Router) and Supabase.
 
