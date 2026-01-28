@@ -1,311 +1,279 @@
 'use client';
 
+
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Card, CardContent, Typography, Box, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Box, Grid, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Divider } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ClassIcon from '@mui/icons-material/Class';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GradeIcon from '@mui/icons-material/Grade';
+import GroupsIcon from '@mui/icons-material/Groups';
+
 
 export default function StudentDashboard() {
-  const [stats, setStats] = useState({
-    totalClasses: 0,
-    pendingAssignments: 0,
-    completedAssessments: 0,
-    averageGrade: 0,
-  });
-  const [profile, setProfile] = useState<{
-    fullname: string;
-    student_id: string;
-  } | null>(null);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  // Profile/overview
+  const [profile, setProfile] = useState<{ fullname: string; student_id: string; term?: string } | null>(null);
+  // Classes
+  const [classes, setClasses] = useState<{ name: string; description: string; studentCount: number; assignmentCount: number }[]>([]);
+  // Quizzes
+  const [quizzes, setQuizzes] = useState<{ id: string; title: string; status: string }[]>([]);
+  // Exam scores
+  const [examScores, setExamScores] = useState<{ type: string; score: number | null }[]>([]);
+  // Performance summary
+  const [gpa, setGpa] = useState<number | null>(null);
+  // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAll = async () => {
       setIsLoading(true);
+      const supabase = createClient();
       try {
-        const supabase = createClient();
-        
-        // Step 1: Get authenticated user
+        // 1. Auth user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        console.log('🔍 Student Dashboard - Auth User:', user);
-        console.log('🔍 Student Dashboard - User Error:', userError);
-        
-        setDebugInfo({
-          step: 'auth_check',
-          userId: user?.id,
-          userEmail: user?.email,
-          userError: userError?.message,
-        });
-        
-        if (userError) {
-          setFetchError('❌ Authentication Error: ' + userError.message);
-          setIsLoading(false);
-          return;
-        }
-        
-        if (!user) {
-          setFetchError('❌ No authenticated user found. Please log in again.');
-          setIsLoading(false);
-          return;
-        }
-        
-        // Step 2: Fetch student profile from students table
+        if (userError || !user) throw new Error('Authentication error. Please log in again.');
+
+        // 2. Profile
         const { data: profileData, error: profileError } = await supabase
           .from('students')
-          .select('fullname, student_id, status')
+          .select('fullname, student_id, status, term')
           .eq('id', user.id)
           .single();
-        
-        console.log('🔍 Student Dashboard - Profile Data:', profileData);
-        console.log('🔍 Student Dashboard - Profile Error:', profileError);
-        
-        setDebugInfo((prev: any) => ({
-          ...prev,
-          step: 'profile_fetch',
-          profileData,
-          profileError: profileError?.message,
-          profileErrorCode: profileError?.code,
-          profileErrorDetails: profileError?.details,
-        }));
-        
-        if (profileError) {
-          if (profileError.code === 'PGRST116') {
-            setFetchError(
-              `❌ Student record not found in database.\n\n` +
-              `User ID: ${user.id}\n` +
-              `This usually means:\n` +
-              `1. Your account was not properly created during signup\n` +
-              `2. You need to be approved by an admin\n` +
-              `3. The student record is missing from the students table`
-            );
-          } else if (profileError.message.includes('permission')) {
-            setFetchError(
-              `❌ Permission Denied (RLS Policy Issue)\n\n` +
-              `User ID: ${user.id}\n` +
-              `The Row Level Security policy is blocking your access.\n` +
-              `Please contact an administrator.`
-            );
-          } else {
-            setFetchError(
-              `❌ Database Error: ${profileError.message}\n\n` +
-              `Code: ${profileError.code}\n` +
-              `Details: ${profileError.details || 'None'}`
-            );
-          }
-          setIsLoading(false);
-          return;
-        }
-        
-        if (!profileData) {
-          setFetchError(
-            `❌ Student record not found.\n\n` +
-            `User ID: ${user.id}\n` +
-            `Email: ${user.email}\n\n` +
-            `Please contact an administrator to create your student profile.`
-          );
-          setIsLoading(false);
-          return;
-        }
-        
-        // Step 3: Check student status
-        if (profileData.status !== 'active') {
-          setFetchError(
-            `⚠️ Account Status: ${profileData.status.toUpperCase()}\n\n` +
-            `Your account is not active yet.\n` +
-            `Please wait for admin approval or contact an administrator.`
-          );
-          setIsLoading(false);
-          return;
-        }
-        
-        // Success: Set profile data
+        if (profileError || !profileData) throw new Error('Student profile not found or not active.');
+        if (profileData.status !== 'active') throw new Error('Your account is not active yet.');
         setProfile(profileData);
-        setStats({
-          totalClasses: 0,
-          pendingAssignments: 0,
-          completedAssessments: 0,
-          averageGrade: 0,
-        });
-        
-        setDebugInfo((prev: any) => ({
-          ...prev,
-          step: 'success',
-          profileLoaded: true,
-        }));
-        
+
+        // 3. Classes (joined)
+        // TODO: Replace with actual join table if available
+        const { data: classData } = await supabase
+          .from('student_classes')
+          .select('class:class_id(name,description), assignment_count, student_count')
+          .eq('student_id', user.id);
+        setClasses((classData || []).map((c: any) => ({
+          name: c.class?.name || 'Class',
+          description: c.class?.description || '',
+          studentCount: c.student_count || 0,
+          assignmentCount: c.assignment_count || 0,
+        })));
+
+        // 4. Quizzes (available to take)
+        const { data: quizData } = await supabase
+          .from('quizzes')
+          .select('id, title, status')
+          .eq('is_active', true);
+        setQuizzes(quizData || []);
+
+        // 5. Exam scores (Prelim, Midterm, Final)
+        const { data: examData } = await supabase
+          .from('examination_scores')
+          .select('type, score')
+          .eq('student_id', user.id);
+        setExamScores(examData || []);
+
+        // 6. Performance summary (GPA)
+        const { data: gpaData } = await supabase
+          .from('student_gpa')
+          .select('gpa')
+          .eq('student_id', user.id)
+          .single();
+        setGpa(gpaData?.gpa ?? null);
+
         setIsLoading(false);
-        
       } catch (err: any) {
-        console.error('🚨 Student Dashboard - Catch Error:', err);
-        setFetchError(
-          `❌ Unexpected Error: ${err?.message || 'Unknown error'}\n\n` +
-          `This might be a network issue or browser problem.\n` +
-          `Please check your internet connection and try again.`
-        );
-        setDebugInfo((prev: any) => ({
-          ...prev,
-          step: 'catch_error',
-          error: err?.message,
-          errorStack: err?.stack,
-        }));
+        setFetchError(err.message || 'Failed to load dashboard.');
         setIsLoading(false);
       }
     };
-    fetchData();
+    fetchAll();
   }, []);
 
-  const statCards = [
-    {
-      title: 'Total Classes',
-      value: stats.totalClasses,
-      icon: <ClassIcon sx={{ fontSize: 40, color: '#8B5CF6' }} />,
-      color: '#F3E8FF',
-    },
-    {
-      title: 'Pending Assignments',
-      value: stats.pendingAssignments,
-      icon: <AssignmentIcon sx={{ fontSize: 40, color: '#F59E0B' }} />,
-      color: '#FEF3C7',
-    },
-    {
-      title: 'Completed Assessments',
-      value: stats.completedAssessments,
-      icon: <DashboardIcon sx={{ fontSize: 40, color: '#10B981' }} />,
-      color: '#D1FAE5',
-    },
-    {
-      title: 'Average Grade',
-      value: stats.averageGrade > 0 ? `${stats.averageGrade}%` : 'N/A',
-      icon: <GradeIcon sx={{ fontSize: 40, color: '#3B82F6' }} />,
-      color: '#DBEAFE',
-    },
-  ];
-
+  // --- UI ---
   return (
-    <Box>
-      {/* Error Display */}
+    <Box sx={{ px: { xs: 1, sm: 2, md: 4 }, py: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
+      {/* Error State */}
       {fetchError && (
-        <Box sx={{ mb: 3 }}>
-          <Card sx={{ bgcolor: '#FEE2E2', border: '2px solid #DC2626' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ color: '#B91C1C', fontWeight: 600, mb: 2 }}>
-                🚨 Dashboard Access Error
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: '#7F1D1D', 
-                  whiteSpace: 'pre-wrap',
-                  fontFamily: 'monospace',
-                  fontSize: '0.9rem'
-                }}
-              >
-                {fetchError}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
+        <Card sx={{ bgcolor: '#FEE2E2', border: '2px solid #DC2626', mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ color: '#B91C1C', fontWeight: 600, mb: 2 }}>
+              🚨 Dashboard Error
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#7F1D1D', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.95rem' }}>
+              {fetchError}
+            </Typography>
+          </CardContent>
+        </Card>
       )}
-      
-      {/* Debug Info (only show if there's an error) */}
-      {debugInfo && fetchError && (
-        <Box sx={{ mb: 3 }}>
-          <Card sx={{ bgcolor: '#EFF6FF', border: '1px solid #3B82F6' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ color: '#1E40AF', fontWeight: 600, mb: 2 }}>
-                🔧 Debug Information
-              </Typography>
-              <Box 
-                component="pre" 
-                sx={{ 
-                  fontSize: '0.75rem', 
-                  color: '#1E3A8A',
-                  overflow: 'auto',
-                  p: 2,
-                  bgcolor: '#DBEAFE',
-                  borderRadius: 1,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-all'
-                }}
-              >
-                {JSON.stringify(debugInfo, null, 2)}
-              </Box>
-              <Typography variant="caption" sx={{ color: '#6B7280', mt: 2, display: 'block' }}>
-                💡 Share this debug info with your administrator for faster troubleshooting.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
-      )}
-      
+
       {/* Loading State */}
       {isLoading && !fetchError && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h6" sx={{ color: '#6B7280', mb: 2 }}>
+          <CircularProgress color="secondary" />
+          <Typography variant="h6" sx={{ color: '#6B7280', mt: 2 }}>
             Loading your dashboard...
           </Typography>
         </Box>
       )}
-      
-      {/* Dashboard Content (only show if no error and not loading) */}
+
+      {/* Main Dashboard Content */}
       {!isLoading && !fetchError && (
         <>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: '#111827', mb: 1 }}>
-            Welcome back, {profile?.fullname || 'Student'}!
-          </Typography>
-      <Typography variant="body1" sx={{ color: '#6B7280', mb: 4 }}>
-        Here&apos;s an overview of your academic progress
-      </Typography>
+          {/* Overview */}
+          <Card sx={{ mb: 3, bgcolor: '#F3E8FF', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#8B5CF6' }}>
+                    {profile?.fullname || 'Student'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
+                    Student ID: <b>{profile?.student_id || 'N/A'}</b>
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
+                    Term: <b>{profile?.term || 'N/A'}</b>
+                  </Typography>
+                </Box>
+                <DashboardIcon sx={{ fontSize: 60, color: '#8B5CF6', alignSelf: 'center' }} />
+              </Box>
+            </CardContent>
+          </Card>
 
-      <Grid container spacing={3}>
-        {statCards.map((card, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card 
-              sx={{ 
-                height: '100%',
-                bgcolor: card.color,
-                boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-                '&:hover': {
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                },
-                transition: 'box-shadow 0.2s',
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: '#111827', mb: 1 }}>
-                      {card.value}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#6B7280', fontWeight: 500 }}>
-                      {card.title}
+          <Grid container spacing={3}>
+            {/* Joined Classes */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ height: '100%', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <ClassIcon sx={{ fontSize: 30, color: '#8B5CF6', mr: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+                      Joined Classes
                     </Typography>
                   </Box>
-                  <Box>{card.icon}</Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  {classes.length === 0 ? (
+                    <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
+                      You haven&apos;t joined any classes yet.
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {classes.map((c, idx) => (
+                        <Card key={idx} sx={{ mb: 1, bgcolor: '#F9FAFB', p: 1 }} elevation={0}>
+                          <CardContent sx={{ py: 1, px: 2 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{c.name}</Typography>
+                            <Typography variant="body2" sx={{ color: '#6B7280' }}>{c.description}</Typography>
+                            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                              <Chip label={`${c.studentCount} students`} size="small" />
+                              <Chip label={`${c.assignmentCount} assignments`} size="small" />
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
 
-          <Box sx={{ mt: 4 }}>
-            <Card sx={{ boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 2 }}>
-                  Recent Activity
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#6B7280' }}>
-                  No recent activity to display
-                </Typography>
-              </CardContent>
-            </Card>
-          </Box>
+            {/* Online Quizzes */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ height: '100%', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <AssignmentIcon sx={{ fontSize: 30, color: '#F59E0B', mr: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+                      Online Quizzes
+                    </Typography>
+                  </Box>
+                  {quizzes.length === 0 ? (
+                    <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
+                      No online quizzes available.
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {quizzes.map((q) => (
+                        <Card key={q.id} sx={{ mb: 1, bgcolor: '#FEF3C7', p: 1 }} elevation={0}>
+                          <CardContent sx={{ py: 1, px: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{q.title}</Typography>
+                            <Button variant="contained" size="small" color="warning" disabled={q.status !== 'open'} sx={{ ml: 2, textTransform: 'none' }}>
+                              {q.status === 'open' ? 'Take Quiz' : 'Closed'}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Exam Scores */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ height: '100%', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', mt: 3 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <GradeIcon sx={{ fontSize: 30, color: '#3B82F6', mr: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+                      Examination Scores
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: '#6B7280', mb: 1 }}>
+                    (Prelim, Midterm, Final — view only. Exams are offline, scores are teacher-recorded.)
+                  </Typography>
+                  {examScores.length === 0 ? (
+                    <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
+                      No examination scores yet.
+                    </Typography>
+                  ) : (
+                    <TableContainer component={Paper} elevation={0} sx={{ mt: 1 }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ bgcolor: '#F9FAFB' }}>
+                            <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Score</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {['Prelim', 'Midterm', 'Final'].map((type) => {
+                            const found = examScores.find((e) => e.type?.toLowerCase() === type.toLowerCase());
+                            return (
+                              <TableRow key={type}>
+                                <TableCell>{type}</TableCell>
+                                <TableCell>{found?.score != null ? found.score : 'N/A'}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Performance Summary */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ height: '100%', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', mt: 3, bgcolor: '#F3E8FF' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ color: '#6B7280', mb: 1 }}>
+                        Performance Summary (GPA)
+                      </Typography>
+                      <Typography variant="h3" sx={{ fontWeight: 700, color: '#8B5CF6' }}>
+                        {gpa != null ? gpa.toFixed(2) : 'N/A'}
+                      </Typography>
+                    </Box>
+                    <DashboardIcon sx={{ fontSize: 60, color: '#8B5CF6' }} />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 4 }} />
+          <Typography variant="body2" sx={{ color: '#6B7280', textAlign: 'center' }}>
+            Exams are offline. Students can only take online quizzes. All data shown is for your account only.
+          </Typography>
         </>
       )}
     </Box>
