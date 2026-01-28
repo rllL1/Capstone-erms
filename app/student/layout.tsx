@@ -24,9 +24,11 @@ import ClassIcon from '@mui/icons-material/Class';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import GradeIcon from '@mui/icons-material/Grade';
 import LogoutIcon from '@mui/icons-material/Logout';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link';
 import Image from 'next/image';
+import JoinClassModal from './components/JoinClassModal';
 
 const drawerWidth = 260;
 
@@ -134,6 +136,7 @@ export default function StudentLayout({
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [joinClassModalOpen, setJoinClassModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -152,22 +155,23 @@ export default function StudentLayout({
         redirect('/student/login');
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('fullname, role, student_id, status, profile_picture')
+      // Fetch from students table (not profiles)
+      const { data: studentData } = await supabase
+        .from('students')
+        .select('fullname, student_id, status, profile_picture')
         .eq('id', user.id)
         .single();
 
-      if (profileData?.role !== 'student') {
+      if (!studentData) {
         redirect('/login');
       }
 
       // Check if student is approved
-      if (profileData?.status !== 'active') {
-        redirect('/student/login');
+      if (studentData?.status !== 'active') {
+        redirect('/login');
       }
 
-      setProfile(profileData);
+      setProfile(studentData);
       setLoading(false);
     };
 
@@ -194,6 +198,14 @@ export default function StudentLayout({
     { text: 'Records', icon: <AssessmentIcon />, path: '/student/records' },
     { text: 'Grades', icon: <GradeIcon />, path: '/student/grades' },
   ];
+
+  const handleJoinClassClick = () => {
+    setJoinClassModalOpen(true);
+  };
+
+  const handleJoinClassSuccess = () => {
+    // Modal will auto-close, page will revalidate via server action
+  };
 
   if (!mounted || loading) {
     return null;
@@ -344,6 +356,64 @@ export default function StudentLayout({
           ))}
         </List>
 
+        {/* Join Class Button - Highlighted */}
+        <Box sx={{ px: open ? 1.5 : 0.5, pb: 2 }}>
+          <ListItemButton
+            onClick={handleJoinClassClick}
+            sx={[
+              {
+                minHeight: 48,
+                borderRadius: 2,
+                bgcolor: '#8B5CF6',
+                color: '#FFFFFF',
+                border: '2px solid #8B5CF6',
+                '&:hover': {
+                  bgcolor: '#7C3AED',
+                  color: '#FFFFFF',
+                  '& .MuiListItemIcon-root': {
+                    color: '#FFFFFF',
+                  },
+                },
+                '& .MuiListItemIcon-root': {
+                  color: '#FFFFFF',
+                },
+              },
+              open
+                ? {
+                    justifyContent: 'initial',
+                    px: 2.5,
+                  }
+                : {
+                    justifyContent: 'center',
+                    px: 2.5,
+                  },
+            ]}
+          >
+            <ListItemIcon
+              sx={[
+                {
+                  minWidth: 0,
+                  justifyContent: 'center',
+                },
+                open
+                  ? {
+                      mr: 3,
+                    }
+                  : {
+                      mr: 'auto',
+                    },
+              ]}
+            >
+              <GroupAddIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Join Class"
+              primaryTypographyProps={{ fontWeight: 600 }}
+              sx={[open ? { opacity: 1 } : { opacity: 0 }]}
+            />
+          </ListItemButton>
+        </Box>
+
         <Box sx={{ flexGrow: 1 }} />
 
         <Box sx={{ p: open ? 2 : 1 }}>
@@ -408,6 +478,13 @@ export default function StudentLayout({
         <DrawerHeader />
         {children}
       </Box>
+
+      {/* Join Class Modal */}
+      <JoinClassModal
+        open={joinClassModalOpen}
+        onClose={() => setJoinClassModalOpen(false)}
+        onSuccess={handleJoinClassSuccess}
+      />
     </Box>
   );
 }

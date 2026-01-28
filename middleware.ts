@@ -46,16 +46,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user exists, check their profile
+  // If user exists, check their profile (teachers/admins in profiles, students in students)
   if (user) {
+    // First try to get profile from profiles table (teacher/admin)
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, status')
       .eq('id', user.id)
       .single();
 
+    // If not in profiles, check students table
+    let userRole = profile?.role;
+    let userStatus = profile?.status;
+
+    if (!profile) {
+      const { data: student } = await supabase
+        .from('students')
+        .select('status')
+        .eq('id', user.id)
+        .single();
+      
+      if (student) {
+        userRole = 'student';
+        userStatus = student.status;
+      }
+    }
+
     // If user is archived, sign them out and redirect to login
-    if (profile?.status === 'archived') {
+    if (userStatus === 'archived') {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       url.searchParams.set('error', 'archived');
@@ -69,8 +87,10 @@ export async function middleware(request: NextRequest) {
     // If on login page and authenticated, redirect to appropriate dashboard
     if (pathname === '/login' || pathname === '/') {
       const url = request.nextUrl.clone();
-      if (profile?.role === 'admin') {
+      if (userRole === 'admin') {
         url.pathname = '/admin/dashboard';
+      } else if (userRole === 'student') {
+        url.pathname = '/student/dashboard';
       } else {
         url.pathname = '/teacher/dashboard';
       }
@@ -78,15 +98,21 @@ export async function middleware(request: NextRequest) {
     }
 
     // Role-based route protection
-    if (pathname.startsWith('/admin') && profile?.role !== 'admin') {
+    if (pathname.startsWith('/admin') && userRole !== 'admin') {
       const url = request.nextUrl.clone();
-      url.pathname = '/teacher/dashboard';
+      url.pathname = userRole === 'student' ? '/student/dashboard' : '/teacher/dashboard';
       return NextResponse.redirect(url);
     }
 
-    if (pathname.startsWith('/teacher') && profile?.role !== 'teacher') {
+    if (pathname.startsWith('/teacher') && userRole !== 'teacher') {
       const url = request.nextUrl.clone();
-      url.pathname = '/admin/dashboard';
+      url.pathname = userRole === 'admin' ? '/admin/dashboard' : '/student/dashboard';
+      return NextResponse.redirect(url);
+    }
+
+    if (pathname.startsWith('/student') && userRole !== 'student') {
+      const url = request.nextUrl.clone();
+      url.pathname = userRole === 'admin' ? '/admin/dashboard' : '/teacher/dashboard';
       return NextResponse.redirect(url);
     }
   }
