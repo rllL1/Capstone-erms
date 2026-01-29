@@ -9,10 +9,6 @@ The student application has been **migrated from Flutter mobile app to a Next.js
 ### New Student Web Portal Files:
 - ✅ `/app/student/page.tsx` - Student root redirect
 - ✅ `/app/student/layout.tsx` - Student layout wrapper
-- ✅ `/app/student/login/page.tsx` - Beautiful student login page
-- ✅ `/app/student/login/actions.ts` - Login server actions
-- ✅ `/app/student/signup/page.tsx` - Student registration page with form validation
-- ✅ `/app/student/signup/actions.ts` - Signup server actions with error handling
 - ✅ `/app/student/dashboard/page.tsx` - Student dashboard with profile info & quick actions
 - ✅ `/app/page.tsx` - Updated homepage with 3 portals (Student, Teacher, Admin)
 
@@ -27,8 +23,6 @@ The student application has been **migrated from Flutter mobile app to a Next.js
 
 ### Access URLs:
 - **Homepage**: http://localhost:3000
-- **Student Login**: http://localhost:3000/student/login
-- **Student Signup**: http://localhost:3000/student/signup
 - **Student Dashboard**: http://localhost:3000/student/dashboard (requires login & approval)
 - **Teacher/Admin Portal**: http://localhost:3000/login
 
@@ -89,8 +83,6 @@ npm run dev
 
 Then visit:
 - http://localhost:3000 - Main landing page
-- http://localhost:3000/student/login - Student login
-- http://localhost:3000/student/signup - Student registration
 
 ## Next Steps
 

@@ -1,6 +1,15 @@
+
+-- (Removed duplicate and outdated students table definition. See below for the correct students table.)
 -- ============================================
--- ERMS Database Schema - Separated Student Tables
--- Student Management System
+-- 1b. Groups Table (Needed for group_id references)
+-- ============================================
+CREATE TABLE IF NOT EXISTS groups (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    teacher_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 -- ============================================
 
 -- ============================================
@@ -9,23 +18,6 @@
 -- Keep existing profiles table for teachers and admins
 -- No changes needed to existing structure
 
--- ============================================
--- 2. Students Table (Separate from Profiles)
--- ============================================
-CREATE TABLE IF NOT EXISTS students (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    student_id VARCHAR(50) UNIQUE NOT NULL,
-    fullname VARCHAR(255) NOT NULL,
-    profile_picture TEXT,
-    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'rejected', 'archived')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes for students table
-CREATE INDEX IF NOT EXISTS idx_students_student_id ON students(student_id);
-CREATE INDEX IF NOT EXISTS idx_students_status ON students(status);
-CREATE INDEX IF NOT EXISTS idx_students_created_at ON students(created_at DESC);
 
 -- ============================================
 -- 3. Exam Grades Table (Updated to use students table)
@@ -425,18 +417,7 @@ FROM groups g
 JOIN group_members gm ON g.id = gm.group_id
 JOIN students s ON gm.student_id = s.id;
 
--- View for pending student approvals
-CREATE OR REPLACE VIEW pending_students AS
-SELECT 
-    s.id,
-    s.student_id,
-    s.fullname,
-    s.created_at,
-    au.email
-FROM students s
-JOIN auth.users au ON s.id = au.id
-WHERE s.status = 'pending'
-ORDER BY s.created_at DESC;
+-- (Removed pending_students view: students are now created as active by admin, no pending status)
 
 -- ============================================
 -- 12. Migration Helper Function

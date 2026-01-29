@@ -174,12 +174,13 @@ export default function AdminLayout({
     redirect('/login');
   };
 
+  // Only show Students menu for admins
   const menuItems = [
     { text: 'Dashboard', icon: <HomeIcon />, path: '/admin/dashboard' },
     { text: 'Teacher', icon: <GroupIcon />, path: '/admin/teacher' },
-    { text: 'Student', icon: <SchoolIcon />, path: '/admin/student' },
+    profile?.role === 'admin' ? { text: 'Students', icon: <SchoolIcon />, path: '/admin/students' } : null,
     { text: 'Assessment', icon: <DescriptionIcon />, path: '/admin/assessment' },
-  ];
+  ].filter(Boolean);
 
   if (loading) {
     return null;

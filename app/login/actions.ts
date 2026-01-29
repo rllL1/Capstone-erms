@@ -34,6 +34,18 @@ export async function login(formData: FormData) {
     .single();
 
   if (profileError || !profile) {
+    // If no profile found in `profiles`, check `students` table for student accounts
+    const { data: student, error: studentError } = await supabase
+      .from('students')
+      .select('user_id')
+      .eq('user_id', data.user.id)
+      .single();
+
+    if (!studentError && student) {
+      // It's a student account — redirect to student dashboard
+      redirect('/student/dashboard');
+    }
+
     await supabase.auth.signOut();
     return { error: 'User profile not found. Please contact administrator.' };
   }

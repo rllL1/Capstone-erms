@@ -1,3 +1,25 @@
+CREATE TABLE IF NOT EXISTS students (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    fullname VARCHAR(255) NOT NULL,
+    student_id VARCHAR(50) UNIQUE NOT NULL,
+    course VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for students table
+CREATE INDEX IF NOT EXISTS idx_students_student_id ON students(student_id);
+CREATE INDEX IF NOT EXISTS idx_students_status ON students(status);
+CREATE INDEX IF NOT EXISTS idx_students_created_at ON students(created_at DESC);
+
+ALTER TABLE students ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Students can view their own profile"
+    ON students FOR SELECT
+    TO authenticated
+    USING (user_id = auth.uid());
 -- ============================================
 -- ERMS Database Schema
 -- Student Management System
@@ -66,17 +88,12 @@ CREATE TABLE IF NOT EXISTS assessment_submissions (
     CONSTRAINT positive_submission_max CHECK (max_score > 0)
 );
 
--- Indexes for assessment_submissions
 CREATE INDEX IF NOT EXISTS idx_submissions_assessment ON assessment_submissions(assessment_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_student ON assessment_submissions(student_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_group ON assessment_submissions(group_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_status ON assessment_submissions(status);
 CREATE INDEX IF NOT EXISTS idx_submissions_submitted_at ON assessment_submissions(submitted_at DESC);
 
--- ============================================
--- 4. Student Group Memberships Table
--- For managing which students belong to which groups
--- ============================================
 CREATE TABLE IF NOT EXISTS group_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     group_id UUID NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
@@ -87,15 +104,10 @@ CREATE TABLE IF NOT EXISTS group_members (
     CONSTRAINT unique_group_student UNIQUE(group_id, student_id)
 );
 
--- Indexes for group_members
 CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members(group_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_student ON group_members(student_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_status ON group_members(status);
 
--- ============================================
--- 5. Final Grades Table
--- For computed final grades based on quizzes, assignments, and exams
--- ============================================
 CREATE TABLE IF NOT EXISTS final_grades (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -137,16 +149,11 @@ CREATE TABLE IF NOT EXISTS final_grades (
     )
 );
 
--- Indexes for final_grades
 CREATE INDEX IF NOT EXISTS idx_final_grades_student ON final_grades(student_id);
 CREATE INDEX IF NOT EXISTS idx_final_grades_teacher ON final_grades(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_final_grades_group ON final_grades(group_id);
 CREATE INDEX IF NOT EXISTS idx_final_grades_academic_year ON final_grades(academic_year);
 
--- ============================================
--- 6. Grade Scale Reference Table
--- Define letter grade mappings
--- ============================================
 CREATE TABLE IF NOT EXISTS grade_scale (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     min_score DECIMAL(5, 2) NOT NULL,
@@ -159,7 +166,6 @@ CREATE TABLE IF NOT EXISTS grade_scale (
     CONSTRAINT valid_scores CHECK (min_score >= 0 AND max_score <= 100)
 );
 
--- Insert default grade scale
 INSERT INTO grade_scale (min_score, max_score, letter_grade, grade_point, description) VALUES
 (90, 100, 'A', 4.00, 'Excellent'),
 (85, 89.99, 'B+', 3.50, 'Very Good'),
@@ -170,10 +176,6 @@ INSERT INTO grade_scale (min_score, max_score, letter_grade, grade_point, descri
 (0, 64.99, 'F', 0.00, 'Failing')
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 7. Student Activity Log
--- Track student actions and engagement
--- ============================================
 CREATE TABLE IF NOT EXISTS student_activity_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -183,16 +185,11 @@ CREATE TABLE IF NOT EXISTS student_activity_log (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for activity log
 CREATE INDEX IF NOT EXISTS idx_activity_log_student ON student_activity_log(student_id);
 CREATE INDEX IF NOT EXISTS idx_activity_log_type ON student_activity_log(activity_type);
 CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON student_activity_log(created_at DESC);
 
--- ============================================
--- 8. Functions and Triggers
--- ============================================
 
--- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -201,7 +198,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers for updated_at
 CREATE TRIGGER update_exam_grades_updated_at
     BEFORE UPDATE ON exam_grades
     FOR EACH ROW
@@ -212,7 +208,6 @@ CREATE TRIGGER update_final_grades_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Function to automatically compute letter grade
 CREATE OR REPLACE FUNCTION compute_letter_grade(score DECIMAL)
 RETURNS VARCHAR(5) AS $$
 DECLARE
@@ -227,7 +222,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to auto-assign letter grade when final_grade is computed
 CREATE OR REPLACE FUNCTION auto_assign_letter_grade()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -241,18 +235,13 @@ CREATE TRIGGER assign_letter_grade_trigger
     FOR EACH ROW
     EXECUTE FUNCTION auto_assign_letter_grade();
 
--- ============================================
--- 9. Row Level Security (RLS) Policies
--- ============================================
 
--- Enable RLS on tables
 ALTER TABLE exam_grades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assessment_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE final_grades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE student_activity_log ENABLE ROW LEVEL SECURITY;
 
--- Exam Grades Policies
 CREATE POLICY "Students can view their own exam grades"
     ON exam_grades FOR SELECT
     TO authenticated
@@ -268,7 +257,6 @@ CREATE POLICY "Teachers can manage exam grades"
         )
     );
 
--- Assessment Submissions Policies
 CREATE POLICY "Students can view their own submissions"
     ON assessment_submissions FOR SELECT
     TO authenticated
@@ -289,7 +277,6 @@ CREATE POLICY "Teachers can view all submissions"
         )
     );
 
--- Group Members Policies
 CREATE POLICY "Students can view their group memberships"
     ON group_members FOR SELECT
     TO authenticated
@@ -306,7 +293,6 @@ CREATE POLICY "Teachers can manage group members"
         )
     );
 
--- Final Grades Policies
 CREATE POLICY "Students can view their own final grades"
     ON final_grades FOR SELECT
     TO authenticated
@@ -322,7 +308,6 @@ CREATE POLICY "Teachers can manage final grades"
         )
     );
 
--- Activity Log Policies
 CREATE POLICY "Students can view their own activity"
     ON student_activity_log FOR SELECT
     TO authenticated
@@ -338,11 +323,7 @@ CREATE POLICY "Teachers and admins can view all activity"
         )
     );
 
--- ============================================
--- 10. Helpful Views
--- ============================================
 
--- View for student performance summary
 CREATE OR REPLACE VIEW student_performance_summary AS
 SELECT 
     p.id AS student_id,
@@ -361,7 +342,6 @@ LEFT JOIN final_grades fg ON p.id = fg.student_id
 WHERE p.role = 'student' AND p.status = 'active'
 GROUP BY p.id, p.student_id, p.fullname;
 
--- View for teacher's student roster
 CREATE OR REPLACE VIEW teacher_student_roster AS
 SELECT 
     g.teacher_id,
@@ -377,22 +357,7 @@ JOIN group_members gm ON g.id = gm.group_id
 JOIN profiles p ON gm.student_id = p.id
 WHERE p.role = 'student';
 
--- ============================================
--- 11. Sample Data Comments
--- ============================================
 
--- To add a student to a group:
--- INSERT INTO group_members (group_id, student_id) 
--- VALUES ('group-uuid', 'student-uuid');
 
--- To record an exam grade:
--- INSERT INTO exam_grades (student_id, teacher_id, exam_name, score, max_score, exam_date)
--- VALUES ('student-uuid', 'teacher-uuid', 'Midterm Exam', 85, 100, '2026-01-26');
 
--- To compute and save final grades:
--- INSERT INTO final_grades (student_id, teacher_id, group_id, subject, term, academic_year, quiz_average, assignment_average, exam_average)
--- VALUES ('student-uuid', 'teacher-uuid', 'group-uuid', 'Mathematics', '1st Quarter', '2025-2026', 88, 90, 85);
 
--- ============================================
--- END OF SCHEMA
--- ============================================

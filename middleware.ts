@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
       const { data: student } = await supabase
         .from('students')
         .select('status')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
       
       if (student) {
