@@ -1,8 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { archiveTeacher, restoreTeacher } from './actions';
 import type { Profile } from '@/types/database';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Pagination from '@mui/material/Pagination';
+import PaginationItem from '@mui/material/PaginationItem';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import BadgeIcon from '@mui/icons-material/Badge';
+import SchoolIcon from '@mui/icons-material/School';
+import EmailIcon from '@mui/icons-material/Email';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import RestoreIcon from '@mui/icons-material/Restore';
+import PersonIcon from '@mui/icons-material/Person';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface TeacherTableProps {
   teachers: (Profile & { email?: string })[];
@@ -11,6 +37,9 @@ interface TeacherTableProps {
 export default function TeacherTable({ teachers }: TeacherTableProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(8);
+  const router = useRouter();
 
   async function handleArchive(teacherId: string) {
     if (!confirm('Are you sure you want to archive this teacher account?')) {
@@ -42,195 +71,251 @@ export default function TeacherTable({ teachers }: TeacherTableProps) {
     setLoadingId(null);
   }
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900">Teacher Records</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          {teachers.length} total teacher{teachers.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
+  const totalPages = Math.ceil(teachers.length / rowsPerPage);
+  const paginatedTeachers = teachers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+
+  return (
+    <Box sx={{ mt: 4 }}>
       {/* Error Message */}
       {error && (
-        <div className="mx-6 mt-4 p-4 rounded-lg bg-red-50 border border-red-200">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            borderRadius: '8px',
+            border: '1px solid #ff6b6b',
+            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+          }}
+        >
+          {error}
+        </Alert>
       )}
 
-      {teachers.length === 0 ? (
-        <div className="p-12 text-center">
-          <svg
-            className="w-12 h-12 text-gray-300 mx-auto mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <Card sx={{
+        borderRadius: '12px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        border: '1px solid rgba(255,255,255,0.5)',
+        background: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(10px)',
+        overflow: 'hidden',
+      }}>
+        {/* Header with Create Button */}
+        <CardContent sx={{
+          background: '#ffffff',
+          borderBottom: '1px solid #e5e7eb',
+          p: 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <Stack direction="row" alignItems="center" gap={2}>
+            <PersonIcon sx={{ fontSize: 32, color: '#667eea' }} />
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#333' }}>Teacher Records</Typography>
+              <Typography variant="body2" sx={{ color: '#999', mt: 0.5 }}>
+                {teachers.length} total teacher{teachers.length !== 1 ? 's' : ''}
+              </Typography>
+            </Box>
+          </Stack>
+          <Button
+            variant="contained"
+            startIcon={<PersonAddIcon />}
+            onClick={() => router.push('/admin/teacher/create')}
+            sx={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              px: 3,
+              '&:hover': {
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+              },
+            }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-            />
-          </svg>
-          <p className="text-gray-500">No teacher accounts found</p>
-          <p className="text-sm text-gray-400 mt-1">Create your first teacher account above</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Employee ID
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Full Name
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Department
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {teachers.map((teacher) => (
-                <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-gray-900">
-                      {teacher.employee_id}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                        <span className="text-green-600 font-medium text-sm">
-                          {teacher.fullname?.charAt(0).toUpperCase() || 'T'}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-900">{teacher.fullname}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">{teacher.department}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">{teacher.email}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                        teacher.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
+            + Create Teacher
+          </Button>
+        </CardContent>
+
+        {/* Table or Empty State */}
+        {teachers.length === 0 ? (
+          <CardContent sx={{ p: 6, textAlign: 'center' }}>
+            <Box sx={{ mb: 2 }}>
+              <PersonIcon sx={{ fontSize: 60, color: '#ddd', mb: 1 }} />
+            </Box>
+            <Typography variant="body1" sx={{ color: '#999', mb: 1 }}>No teacher accounts found</Typography>
+            <Typography variant="body2" sx={{ color: '#bbb' }}>Create your first teacher account above</Typography>
+          </CardContent>
+        ) : (
+          <Box>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <BadgeIcon sx={{ fontSize: 18 }} />
+                        Employee ID
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      Full Name
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <SchoolIcon sx={{ fontSize: 18 }} />
+                        Department
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <EmailIcon sx={{ fontSize: 18 }} />
+                        Email
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      Status
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedTeachers.map((teacher, index) => (
+                    <TableRow
+                      key={teacher.id}
+                      sx={{
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                        '&:hover': {
+                          backgroundColor: '#f0f4ff',
+                          transition: 'background-color 0.2s ease',
+                        },
+                        borderBottom: '1px solid #e5e7eb',
+                      }}
                     >
-                      {teacher.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    {teacher.status === 'active' ? (
-                      <button
-                        onClick={() => handleArchive(teacher.id)}
-                        disabled={loadingId === teacher.id}
-                        className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {loadingId === teacher.id ? (
-                          <svg
-                            className="animate-spin w-4 h-4 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                            />
-                          </svg>
-                        )}
-                        Archive
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleRestore(teacher.id)}
-                        disabled={loadingId === teacher.id}
-                        className="inline-flex items-center px-3 py-1.5 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {loadingId === teacher.id ? (
-                          <svg
-                            className="animate-spin w-4 h-4 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                            />
-                          </svg>
-                        )}
-                        Restore
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                      <TableCell sx={{ color: '#667eea', fontWeight: 600 }}>
+                        {teacher.employee_id || '-'}
+                      </TableCell>
+                      <TableCell sx={{ color: '#333', fontWeight: 500 }}>
+                        {teacher.fullname || 'N/A'}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {teacher.department || '-'}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {teacher.email || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={teacher.status === 'archived' ? 'Archived' : 'Active'}
+                          color={teacher.status === 'archived' ? 'default' : 'success'}
+                          size="small"
+                          sx={{
+                            fontWeight: 600,
+                            borderRadius: '6px',
+                            ...(teacher.status === 'archived' && {
+                              backgroundColor: '#f3f4f6',
+                              color: '#999',
+                              border: '1px solid #e5e7eb',
+                            }),
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <Stack direction="row" spacing={1} justifyContent="flex-end">
+                          {teacher.status === 'archived' ? (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              startIcon={<RestoreIcon />}
+                              onClick={() => handleRestore(teacher.id)}
+                              disabled={loadingId === teacher.id}
+                              sx={{
+                                borderColor: '#4caf50',
+                                color: '#4caf50',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                fontSize: '0.85rem',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                                  borderColor: '#4caf50',
+                                },
+                              }}
+                            >
+                              Restore
+                            </Button>
+                          ) : (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              startIcon={<ArchiveIcon />}
+                              onClick={() => handleArchive(teacher.id)}
+                              disabled={loadingId === teacher.id}
+                              sx={{
+                                borderColor: '#ff9800',
+                                color: '#ff9800',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                fontSize: '0.85rem',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 152, 0, 0.08)',
+                                  borderColor: '#ff9800',
+                                },
+                              }}
+                            >
+                              Archive
+                            </Button>
+                          )}
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {/* Custom Pagination */}
+            <Box sx={{
+              backgroundColor: '#f9fafb',
+              borderTop: '1px solid #e5e7eb',
+              p: 3,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                renderItem={(item) => (
+                  <PaginationItem
+                    slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
+                    {...item}
+                    sx={{
+                      color: '#667eea',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      mx: 0.5,
+                      '&.Mui-selected': {
+                        backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        border: 'none',
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(102, 126, 234, 0.08)',
+                      },
+                    }}
+                  />
+                )}
+              />
+            </Box>
+          </Box>
+        )}
+      </Card>
+    </Box>
   );
 }

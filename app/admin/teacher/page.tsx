@@ -1,8 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Profile } from '@/types/database';
-import TeacherForm from './TeacherForm';
 import TeacherTable from './TeacherTable';
+import TeacherRefreshButton from '@/app/admin/teacher/TeacherRefreshButton';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import SchoolIcon from '@mui/icons-material/School';
 
 async function getTeachers(): Promise<(Profile & { email?: string })[]> {
   const supabase = await createClient();
@@ -39,18 +43,30 @@ export default async function TeacherPage() {
   const teachers = await getTeachers();
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Teacher Management</h1>
-        <p className="text-gray-500 mt-1">Create and manage teacher accounts</p>
-      </div>
-
-      {/* Create Teacher Form */}
-      <TeacherForm />
+    <Box sx={{ minHeight: '100vh', background: '#ffffff', p: 3 }}>
+      {/* Header Section */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: '12px',
+        p: 3,
+        mb: 4,
+        color: 'white',
+        boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+      }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
+            <SchoolIcon sx={{ fontSize: 40 }} />
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>Teacher Management</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Manage and create teacher accounts</Typography>
+            </Box>
+          </Stack>
+          <TeacherRefreshButton />
+        </Stack>
+      </Box>
 
       {/* Teacher Table */}
       <TeacherTable teachers={teachers} />
-    </div>
+    </Box>
   );
 }

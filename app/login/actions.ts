@@ -10,7 +10,7 @@ export async function login(formData: FormData) {
   const password = formData.get('password') as string;
 
   if (!email || !password) {
-    return { error: 'Email and password are required' };
+    return;
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -19,11 +19,11 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    return;
   }
 
   if (!data.user) {
-    return { error: 'Login failed' };
+    return;
   }
 
   // Fetch user profile to check status and role
@@ -47,13 +47,13 @@ export async function login(formData: FormData) {
     }
 
     await supabase.auth.signOut();
-    return { error: 'User profile not found. Please contact administrator.' };
+    return;
   }
 
   // Check if user is archived
   if (profile.status === 'archived') {
     await supabase.auth.signOut();
-    return { error: 'Your account has been archived. Please contact administrator.' };
+    return;
   }
 
   // Redirect based on role

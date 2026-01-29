@@ -12,18 +12,26 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Alert from '@mui/material/Alert';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Pagination from '@mui/material/Pagination';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Grid from '@mui/material/Grid';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PeopleIcon from '@mui/icons-material/People';
+import EmailIcon from '@mui/icons-material/Email';
+import BadgeIcon from '@mui/icons-material/Badge';
+import SchoolIcon from '@mui/icons-material/School';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 type Student = {
   id: string;
@@ -37,12 +45,9 @@ type Student = {
 
 export default function AdminStudentsPage() {
   const [students, setStudents] = useState<Student[] | null>(null);
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Array<{ name: string; id: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ fullname: '', studentId: '', course: '', email: '', password: '' });
-  const [creating, setCreating] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [page, setPage] = useState(1);
@@ -61,8 +66,9 @@ export default function AdminStudentsPage() {
       if ((data.students || []).length === 0) {
         // empty response handled in UI
       }
-    } catch (err: any) {
-      setError(err?.message || 'Unable to load students');
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Unable to load students';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -89,154 +95,227 @@ export default function AdminStudentsPage() {
   const pageCount = Math.max(1, Math.ceil(filteredStudents.length / rowsPerPage));
   const paged = filteredStudents.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCreating(true);
-    setMessage(null);
-    try {
-      const res = await fetch('/api/admin/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullname: form.fullname,
-          studentId: form.studentId,
-          course: form.course,
-          email: form.email,
-          password: form.password,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        if (data?.field === 'studentId') setMessage('Student ID already exists');
-        else if (data?.field === 'email') setMessage('Email already registered');
-        else setMessage(data?.error || 'Failed to create student');
-        return;
-      }
-
-      setMessage('Student created successfully');
-      setForm({ fullname: '', studentId: '', course: '', email: '', password: '' });
-      await load();
-    } catch (err: any) {
-      setMessage(err?.message || 'Failed to create student');
-    } finally {
-      setCreating(false);
-    }
+  const handleCreateClick = () => {
+    router.push('/admin/students/create');
   };
 
   return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h5">Students</Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <IconButton aria-label="refresh" onClick={() => { setQuery(''); setSelectedCourse(''); setPage(1); router.refresh(); }}>
-            <RefreshIcon />
-          </IconButton>
-          <Button variant="contained" onClick={() => router.refresh()}>Refresh</Button>
-        </Stack>
-      </Stack>
-
-      {loading && <Typography>Loading students...</Typography>}
-      {error && <Alert severity="error">Unable to load students</Alert>}
-
-      {!loading && students && (
-        <Paper sx={{ p: 2, mb: 4 }} elevation={1}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" sx={{ mb: 2 }}>
-            <TextField
-              placeholder="Search by name, id or email"
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-              size="small"
-              sx={{ minWidth: 240 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <FormControl size="small" sx={{ minWidth: 200 }}>
-              <InputLabel>Course</InputLabel>
-              <Select
-                label="Course"
-                value={selectedCourse}
-                onChange={(e) => { setSelectedCourse(e.target.value); setPage(1); }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {courses.map((c) => (
-                  <MenuItem key={c.name || c.id} value={c.name}>{c.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+    <Box sx={{ minHeight: 'auto', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', p: 3 }}>
+      {/* Header Section */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: '12px',
+        p: 3,
+        mb: 4,
+        color: 'white',
+        boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+      }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
+            <PeopleIcon sx={{ fontSize: 40 }} />
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>Student Management</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Manage and create student accounts</Typography>
+            </Box>
           </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <IconButton
+              aria-label="refresh"
+              onClick={() => { setQuery(''); setSelectedCourse(''); setPage(1); router.refresh(); }}
+              sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}
+            >
+              <RefreshIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
+      </Box>
 
-          {filteredStudents.length === 0 ? (
-            <Alert severity="info">No students match your search.</Alert>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Student ID</TableCell>
-                    <TableCell>Full Name</TableCell>
-                    <TableCell>Course</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paged.map((s) => (
-                    <TableRow key={s.id} hover>
-                      <TableCell>{s.student_id}</TableCell>
-                      <TableCell>{s.fullname}</TableCell>
-                      <TableCell>{s.course}</TableCell>
-                      <TableCell>{s.email}</TableCell>
-                      <TableCell>{s.status}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              <Stack alignItems="center" sx={{ mt: 2 }}>
-                <Pagination count={pageCount} page={page} onChange={(_, v) => setPage(v)} color="primary" />
-              </Stack>
-            </>
-          )}
-        </Paper>
+      {loading && (
+        <Card sx={{ p: 3, textAlign: 'center', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)' }}>
+          <Typography sx={{ color: '#667eea', fontWeight: 600 }}>Loading students...</Typography>
+        </Card>
+      )}
+      {error && (
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            borderRadius: '8px',
+            border: '1px solid #ff6b6b',
+            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+          }}
+        >
+          Unable to load students
+        </Alert>
       )}
 
-      <Paper sx={{ p: 3 }} elevation={1}>
-        <Grid container spacing={2} component="form" onSubmit={handleCreate}>
-          <Grid item xs={12}>
-            <Typography variant="h6">Create Student Account</Typography>
-            {message && <Alert sx={{ mb: 2 }}>{message}</Alert>}
-          </Grid>
+      {!loading && students && (
+        <Card sx={{
+          mb: 4,
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255,255,255,0.5)',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(10px)',
+        }}>
+          <CardContent>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" sx={{ flex: 1, width: '100%' }}>
+                <TextField
+                  placeholder="Search by name, id or email"
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+                  size="small"
+                  sx={{
+                    flex: 1,
+                    minWidth: '240px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f7fa',
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: '#667eea' }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-          <Grid item xs={12} md={6}>
-            <TextField fullWidth label="Full name" value={form.fullname} onChange={(e) => setForm({ ...form, fullname: e.target.value })} />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField fullWidth label="Student ID" value={form.studentId} onChange={(e) => setForm({ ...form, studentId: e.target.value })} />
-          </Grid>
+              <FormControl size="small" sx={{ minWidth: '200px', flex: 1 }}>
+                <InputLabel>Course</InputLabel>
+                <Select
+                  label="Course"
+                  value={selectedCourse}
+                  onChange={(e) => { setSelectedCourse(e.target.value); setPage(1); }}
+                  sx={{
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f7fa',
+                  }}
+                >
+                  <MenuItem value="">All Courses</MenuItem>
+                  {courses.map((c) => (
+                    <MenuItem key={c.name || c.id} value={c.name}>{c.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              </Stack>
 
-          <Grid item xs={12} md={6}>
-            <TextField fullWidth label="Course" value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField fullWidth label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          </Grid>
+              <Button
+                onClick={handleCreateClick}
+                variant="contained"
+                startIcon={<PersonAddIcon />}
+                sx={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  borderRadius: '8px',
+                  px: 3,
+                  py: 1.2,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                    transform: 'translateY(-2px)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                + Create Student
+              </Button>
+            </Stack>
 
-          <Grid item xs={12} md={6}>
-            <TextField fullWidth label="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          </Grid>
+            {filteredStudents.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <PeopleIcon sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
+                <Typography variant="h6" sx={{ color: '#999', fontWeight: 500 }}>No students match your search</Typography>
+                <Typography variant="body2" sx={{ color: '#bbb', mt: 1 }}>Try adjusting your filters or search terms</Typography>
+              </Box>
+            ) : (
+              <>
+                <Box sx={{ overflowX: 'auto' }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ backgroundColor: '#f5f7fa', borderBottom: '2px solid #667eea' }}>
+                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Student ID</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Full Name</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Course</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Email</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Status</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paged.map((s, index) => (
+                        <TableRow
+                          key={s.id}
+                          sx={{
+                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                            '&:hover': {
+                              backgroundColor: '#f0f4ff',
+                              transition: 'all 0.2s ease',
+                            },
+                            borderBottom: '1px solid #eee',
+                          }}
+                        >
+                          <TableCell sx={{ fontWeight: 600, color: '#333' }}>
+                            <Chip
+                              icon={<BadgeIcon />}
+                              label={s.student_id}
+                              variant="outlined"
+                              size="small"
+                              sx={{ borderColor: '#667eea', color: '#667eea' }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ color: '#333', fontWeight: 500 }}>{s.fullname}</TableCell>
+                          <TableCell sx={{ color: '#666' }}>
+                            <Chip icon={<SchoolIcon />} label={s.course} size="small" variant="outlined" />
+                          </TableCell>
+                          <TableCell sx={{ color: '#666' }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <EmailIcon sx={{ fontSize: 18, color: '#999' }} />
+                              <Typography variant="body2">{s.email}</Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              icon={s.status === 'active' ? <CheckCircleIcon /> : <CancelIcon />}
+                              label={s.status}
+                              size="small"
+                              color={s.status === 'active' ? 'success' : 'default'}
+                              variant="filled"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
 
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" disabled={creating}>{creating ? 'Creating...' : 'Create Student'}</Button>
-          </Grid>
-        </Grid>
-      </Paper>
+                <Stack alignItems="center" sx={{ mt: 3 }}>
+                  <Pagination
+                    count={pageCount}
+                    page={page}
+                    onChange={(_, v) => setPage(v)}
+                    color="primary"
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        borderRadius: '8px',
+                      },
+                    }}
+                  />
+                </Stack>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Spacer */}
     </Box>
   );
 }
