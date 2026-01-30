@@ -1,4 +1,4 @@
-# ERMS - Educational Record Management System
+# ERMS - Exam Record Management System
 
 A comprehensive, role-based educational platform built with Next.js 15 (App Router) and Supabase. Designed for admins, teachers, and students to manage classes, assessments, and academic records in a modern, intuitive interface.
 
