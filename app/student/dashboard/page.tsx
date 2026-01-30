@@ -152,12 +152,12 @@ export default function StudentDashboard() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
-      {/* Welcome Section */}
-      <div className="mb-6 lg:mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
+      {/* Welcome Section with Soft Light Header */}
+      <div className="mb-6 lg:mb-8 p-6 lg:p-8 rounded-2xl bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border border-purple-100 shadow-sm">
+        <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
           Welcome back, {name ? name.split(' ')[0] : 'Student'}!
         </h1>
-        <p className="text-gray-600 mt-2">Here&apos;s your learning progress at a glance</p>
+        <p className="text-gray-600 text-base lg:text-lg font-medium">Here&apos;s your learning progress at a glance</p>
       </div>
 
       {error && (
@@ -169,13 +169,13 @@ export default function StudentDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
         {/* Classes Enrolled */}
-        <div className="bg-white rounded-lg lg:rounded-xl shadow-md border border-purple-200 p-4 lg:p-6 hover:shadow-lg transition-shadow">
+        <div className="group bg-white rounded-2xl shadow-md border border-purple-200 p-4 lg:p-6 hover:shadow-xl hover:border-purple-400 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2">Classes Enrolled</p>
-              <p className="text-2xl lg:text-4xl font-bold text-gray-900">{stats.classesCount}</p>
+              <p className="text-gray-600 text-xs lg:text-sm font-semibold mb-2 uppercase tracking-wide">Classes Enrolled</p>
+              <p className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">{stats.classesCount}</p>
             </div>
-            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-purple-500 to-purple-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all shrink-0">
               <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
@@ -184,14 +184,14 @@ export default function StudentDashboard() {
         </div>
 
         {/* Tasks Completed */}
-        <div className="bg-white rounded-lg lg:rounded-xl shadow-md border border-green-200 p-4 lg:p-6 hover:shadow-lg transition-shadow">
+        <div className="group bg-white rounded-2xl shadow-md border border-green-200 p-4 lg:p-6 hover:shadow-xl hover:border-green-400 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2">Tasks Completed</p>
-              <p className="text-2xl lg:text-4xl font-bold text-gray-900">{stats.submittedAssessments}</p>
-              <p className="text-xs text-green-600 font-medium mt-1">{completionRate}% complete</p>
+              <p className="text-gray-600 text-xs lg:text-sm font-semibold mb-2 uppercase tracking-wide">Tasks Completed</p>
+              <p className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{stats.submittedAssessments}</p>
+              <p className="text-xs text-green-600 font-bold mt-1.5">{completionRate}% complete</p>
             </div>
-            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all shrink-0">
               <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -200,14 +200,14 @@ export default function StudentDashboard() {
         </div>
 
         {/* Pending Tasks */}
-        <div className="bg-white rounded-lg lg:rounded-xl shadow-md border border-amber-200 p-4 lg:p-6 hover:shadow-lg transition-shadow">
+        <div className="group bg-white rounded-2xl shadow-md border border-amber-200 p-4 lg:p-6 hover:shadow-xl hover:border-amber-400 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2">Pending Tasks</p>
-              <p className="text-2xl lg:text-4xl font-bold text-gray-900">{stats.pendingAssessments}</p>
-              <p className="text-xs text-amber-600 font-medium mt-1">{stats.pendingAssessments > 0 ? 'Action needed' : 'All set'}</p>
+              <p className="text-gray-600 text-xs lg:text-sm font-semibold mb-2 uppercase tracking-wide">Pending Tasks</p>
+              <p className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{stats.pendingAssessments}</p>
+              <p className="text-xs text-amber-600 font-bold mt-1.5">{stats.pendingAssessments > 0 ? 'Action needed' : 'All set'}</p>
             </div>
-            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-amber-500 to-amber-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all shrink-0">
               <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -216,14 +216,14 @@ export default function StudentDashboard() {
         </div>
 
         {/* Average Grade */}
-        <div className="bg-white rounded-lg lg:rounded-xl shadow-md border border-blue-200 p-4 lg:p-6 hover:shadow-lg transition-shadow">
+        <div className="group bg-white rounded-2xl shadow-md border border-blue-200 p-4 lg:p-6 hover:shadow-xl hover:border-blue-400 transition-all duration-300 hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1 lg:mb-2">Average Grade</p>
-              <p className="text-2xl lg:text-4xl font-bold text-gray-900">{stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : 'N/A'}</p>
-              <p className="text-xs text-blue-600 font-medium mt-1">{gradeLevel}</p>
+              <p className="text-gray-600 text-xs lg:text-sm font-semibold mb-2 uppercase tracking-wide">Average Grade</p>
+              <p className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : 'N/A'}</p>
+              <p className="text-xs text-blue-600 font-bold mt-1.5">{gradeLevel}</p>
             </div>
-            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all shrink-0">
               <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -235,56 +235,56 @@ export default function StudentDashboard() {
       {/* Quick Actions */}
       {stats.pendingAssessments > 0 && (
         <div className="mb-6 lg:mb-8">
-          <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-3 lg:mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
+          <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 lg:mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
             <Link
               href="/student/class"
-              className="bg-linear-to-br from-amber-50 to-amber-100 rounded-lg lg:rounded-xl shadow-sm border border-amber-200 p-4 lg:p-6 hover:shadow-lg transition-all hover:border-amber-400 hover:from-amber-100 hover:to-amber-200 group"
+              className="group relative overflow-hidden rounded-2xl shadow-md border border-amber-200 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white hover:border-amber-400"
             >
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-amber-500 to-amber-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-100 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-300" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg mb-4 lg:mb-5 group-hover:shadow-xl group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-sm lg:text-base font-bold text-gray-900">View Pending Tasks</h3>
-                  <p className="text-xs lg:text-sm text-amber-700">{stats.pendingAssessments} tasks remaining</p>
-                </div>
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">View Pending Tasks</h3>
+                <p className="text-sm text-gray-600 mb-3">{stats.pendingAssessments} tasks remaining</p>
+                <div className="inline-block text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Start now →</div>
               </div>
             </Link>
 
             <Link
               href="/student/performance"
-              className="bg-linear-to-br from-blue-50 to-blue-100 rounded-lg lg:rounded-xl shadow-sm border border-blue-200 p-4 lg:p-6 hover:shadow-lg transition-all hover:border-blue-400 hover:from-blue-100 hover:to-blue-200 group"
+              className="group relative overflow-hidden rounded-2xl shadow-md border border-blue-200 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white hover:border-blue-400"
             >
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-300" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg mb-4 lg:mb-5 group-hover:shadow-xl group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-sm lg:text-base font-bold text-gray-900">Check Performance</h3>
-                  <p className="text-xs lg:text-sm text-blue-700">View all scores</p>
-                </div>
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">Check Performance</h3>
+                <p className="text-sm text-gray-600 mb-3">View all scores and progress</p>
+                <div className="inline-block text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">View →</div>
               </div>
             </Link>
 
             <Link
               href="/student/grades"
-              className="bg-linear-to-br from-green-50 to-green-100 rounded-lg lg:rounded-xl shadow-sm border border-green-200 p-4 lg:p-6 hover:shadow-lg transition-all hover:border-green-400 hover:from-green-100 hover:to-green-200 group"
+              className="group relative overflow-hidden rounded-2xl shadow-md border border-green-200 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white hover:border-green-400"
             >
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-linear-to-br from-green-500 to-green-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-100 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-300" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg mb-4 lg:mb-5 group-hover:shadow-xl group-hover:scale-110 transition-all">
                   <svg className="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="text-sm lg:text-base font-bold text-gray-900">View Final Grades</h3>
-                  <p className="text-xs lg:text-sm text-green-700">All subjects</p>
-                </div>
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">View Final Grades</h3>
+                <p className="text-sm text-gray-600 mb-3">All subjects and assessments</p>
+                <div className="inline-block text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">Check →</div>
               </div>
             </Link>
           </div>
@@ -292,80 +292,106 @@ export default function StudentDashboard() {
       )}
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
-        {/* Left Column - Assignments */}
-        <div className="lg:col-span-2 bg-linear-to-br from-purple-50 via-white to-purple-50 rounded-lg lg:rounded-xl shadow-md border border-purple-200 p-4 lg:p-6">
-          <div className="flex justify-between items-center mb-4 lg:mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 lg:w-8 lg:h-8 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Left Column - Learning Progress */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-md border border-purple-200 p-6 lg:p-8 hover:shadow-lg transition-all duration-300">
+          <div className="flex justify-between items-center mb-6 lg:mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h2 className="text-base lg:text-xl font-bold text-gray-900">Learning Progress</h2>
+              <div>
+                <h2 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Learning Progress</h2>
+              </div>
             </div>
-            <span className="text-sm lg:text-base font-bold text-purple-600">{completionRate}%</span>
+            <span className="text-2xl lg:text-3xl font-bold text-purple-600">{completionRate}%</span>
           </div>
           
-          <div className="space-y-3">
-            <div className="p-4 bg-white rounded-lg border border-purple-100 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">Task Completion</h3>
-                <span className="text-sm font-medium text-purple-600">{stats.submittedAssessments}/{totalTasks}</span>
+          <div className="space-y-4 lg:space-y-6">
+            {/* Main Progress Bar */}
+            <div className="p-5 lg:p-6 bg-gradient-to-br from-purple-50 to-purple-25 rounded-xl lg:rounded-2xl border border-purple-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4 lg:mb-5">
+                <h3 className="font-bold text-gray-900 text-base lg:text-lg">Task Completion</h3>
+                <span className="text-sm lg:text-base font-bold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">{stats.submittedAssessments}/{totalTasks} tasks</span>
               </div>
-              <div className="w-full bg-purple-100 rounded-full h-2.5">
-                <div className="bg-linear-to-r from-purple-500 to-purple-600 h-2.5 rounded-full transition-all" style={{ inlineSize: `${completionRate}%` }}></div>
+              <div className="w-full bg-purple-200 rounded-full h-3 lg:h-4 overflow-hidden shadow-sm">
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 h-full rounded-full transition-all duration-500 ease-out" style={{ inlineSize: `${completionRate}%` }}></div>
               </div>
+              <p className="mt-3 text-xs lg:text-sm text-gray-600 font-medium">{completionRate === 100 ? '🎉 All tasks completed!' : `${totalTasks - stats.submittedAssessments} tasks remaining`}</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 lg:p-4 bg-white rounded-lg border border-purple-100 text-center shadow-sm">
-                <p className="text-2xl lg:text-3xl font-bold text-purple-600">{stats.classesCount}</p>
-                <p className="text-xs lg:text-sm text-gray-600 font-medium">Classes</p>
+            {/* Summary Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 lg:gap-4">
+              <div className="p-4 lg:p-5 bg-gradient-to-br from-purple-50 to-white rounded-xl lg:rounded-2xl border border-purple-200 text-center shadow-sm hover:shadow-md transition-all hover:border-purple-400">
+                <p className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">{stats.classesCount}</p>
+                <p className="text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wide">Classes</p>
               </div>
-              <div className="p-3 lg:p-4 bg-white rounded-lg border border-green-100 text-center shadow-sm">
-                <p className="text-2xl lg:text-3xl font-bold text-green-600">{stats.submittedAssessments}</p>
-                <p className="text-xs lg:text-sm text-gray-600 font-medium">Completed</p>
+              <div className="p-4 lg:p-5 bg-gradient-to-br from-green-50 to-white rounded-xl lg:rounded-2xl border border-green-200 text-center shadow-sm hover:shadow-md transition-all hover:border-green-400">
+                <p className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">{stats.submittedAssessments}</p>
+                <p className="text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wide">Completed</p>
               </div>
-              <div className="p-3 lg:p-4 bg-white rounded-lg border border-amber-100 text-center shadow-sm">
-                <p className="text-2xl lg:text-3xl font-bold text-amber-600">{stats.pendingAssessments}</p>
-                <p className="text-xs lg:text-sm text-gray-600 font-medium">Pending</p>
+              <div className="p-4 lg:p-5 bg-gradient-to-br from-amber-50 to-white rounded-xl lg:rounded-2xl border border-amber-200 text-center shadow-sm hover:shadow-md transition-all hover:border-amber-400">
+                <p className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">{stats.pendingAssessments}</p>
+                <p className="text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wide">Pending</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Column - Performance Summary */}
-        <div className="bg-linear-to-br from-blue-50 via-white to-blue-50 rounded-lg lg:rounded-xl shadow-md border border-blue-200 p-4 lg:p-6">
-          <div className="flex items-center gap-2 mb-4 lg:mb-6">
-            <div className="w-7 h-7 lg:w-8 lg:h-8 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white rounded-2xl shadow-md border border-blue-200 p-6 lg:p-8 hover:shadow-lg transition-all duration-300">
+          <div className="flex items-center gap-3 mb-6 lg:mb-8">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+              <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h2 className="text-base lg:text-xl font-bold text-gray-900">Performance</h2>
+            <h2 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Performance</h2>
           </div>
 
-          <div className="space-y-3">
-            <div className="p-4 bg-white rounded-lg border border-blue-100 text-center shadow-sm">
-              <p className="text-gray-600 text-xs lg:text-sm font-medium mb-1">Average Grade</p>
-              <p className="text-3xl lg:text-4xl font-bold text-blue-600">{stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : 'N/A'}</p>
-              <p className="text-xs lg:text-sm text-blue-600 font-semibold mt-2">{gradeLevel}</p>
+          <div className="space-y-4 lg:space-y-5">
+            {/* Average Grade Card */}
+            <div className="p-5 lg:p-6 bg-gradient-to-br from-blue-50 to-blue-25 rounded-xl lg:rounded-2xl border border-blue-200 text-center shadow-sm">
+              <p className="text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3 lg:mb-4">Average Grade</p>
+              <p className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">{stats.averageGrade > 0 ? stats.averageGrade.toFixed(1) : 'N/A'}</p>
+              <div className="flex items-center justify-center gap-2">
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs lg:text-sm font-bold ${
+                  stats.averageGrade >= 90 ? 'bg-green-100 text-green-700' :
+                  stats.averageGrade >= 80 ? 'bg-blue-100 text-blue-700' :
+                  stats.averageGrade >= 70 ? 'bg-amber-100 text-amber-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  <span className={stats.averageGrade >= 80 ? '✓' : stats.averageGrade > 0 ? '→' : '—'}></span>
+                  {gradeLevel}
+                </div>
+              </div>
             </div>
 
-            <Link href="/student/performance" className="w-full inline-flex items-center justify-center px-4 py-2.5 lg:py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              View Details
-            </Link>
+            {/* Grade Distribution */}
+            <div className="p-5 lg:p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-xl lg:rounded-2xl border border-purple-200 shadow-sm">
+              <h3 className="text-sm lg:text-base font-bold text-gray-900 mb-4">Performance Distribution</h3>
+              <div className="space-y-3 lg:space-y-4">
+                {stats.averageGrade > 0 && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg text-xs font-bold shadow-md">A+</span>
+                      <div className="flex-1 bg-blue-100 rounded-full h-2.5 overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full" style={{ inlineSize: `${Math.min(stats.averageGrade / 100 * 100, 100)}%` }}></div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
 
-            <Link href="/student/profile" className="w-full inline-flex items-center justify-center px-4 py-2.5 lg:py-3 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-semibold rounded-lg transition-all">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              My Profile
-            </Link>
+            {/* Motivational Message */}
+            <div className="p-4 lg:p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl lg:rounded-2xl border border-green-200 text-center shadow-sm">
+              <p className="text-sm lg:text-base font-bold text-green-900">
+                {stats.pendingAssessments === 0 ? '✨ Keep up the great work!' : `${stats.pendingAssessments} tasks to excel further!`}
+              </p>
+            </div>
           </div>
         </div>
       </div>

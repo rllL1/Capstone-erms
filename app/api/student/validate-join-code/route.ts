@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find join code with related group and teacher info
-    const { data: joinCode, error: codeError } = await supabase
+    const { data: joinCodeData, error: codeError } = await supabase
       .from('class_join_codes')
       .select(`
         id,
@@ -64,11 +64,78 @@ export async function POST(request: NextRequest) {
       .eq('code', code.toUpperCase())
       .single();
 
-    if (codeError || !joinCode) {
-      return NextResponse.json(
-        { error: 'Code not found or invalid' },
-        { status: 404 }
-      );
+    console.log('Join code lookup from class_join_codes:', { joinCodeData, codeError });
+
+    let joinCode = joinCodeData;
+
+    // If not found in class_join_codes, try checking the groups table directly
+    if (!joinCodeData) {
+      console.log('Code not found in class_join_codes, checking groups table...');
+      
+      const { data: groupData, error: groupError } = await supabase
+        .from('groups')
+        .select(`
+          id,
+          name,
+          subject,
+          teacher_id,
+          profiles:teacher_id (fullname)
+        `)
+        .eq('code', code.toUpperCase())
+        .single();
+
+      console.log('Groups table lookup:', { groupData, groupError });
+
+      if (!groupData) {
+        console.error('Code not found in either table:', code.toUpperCase());
+        return NextResponse.json(
+          { error: 'Code not found or invalid' },
+          { status: 404 }
+        );
+      }
+
+      // Found in groups table, create a join code entry for it and use that
+      console.log('Creating join code for group:', groupData.id);
+      
+      const { data: newJoinCode, error: createError } = await supabase
+        .from('class_join_codes')
+        .insert({
+          group_id: groupData.id,
+          code: code.toUpperCase(),
+          max_uses: -1,
+          current_uses: 0,
+          is_active: true,
+          created_by: groupData.teacher_id,
+        })
+        .select(`
+          id,
+          group_id,
+          code,
+          max_uses,
+          current_uses,
+          is_active,
+          expires_at,
+          groups:group_id (
+            id,
+            name,
+            subject,
+            teacher_id,
+            profiles:teacher_id (fullname)
+          )
+        `)
+        .single();
+
+      console.log('Join code creation result:', { newJoinCode, createError });
+
+      if (!newJoinCode) {
+        console.error('Failed to create join code:', createError);
+        return NextResponse.json(
+          { error: 'Code not found or invalid' },
+          { status: 404 }
+        );
+      }
+
+      joinCode = newJoinCode;
     }
 
     // === Validation Checks ===

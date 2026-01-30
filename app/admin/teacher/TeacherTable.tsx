@@ -96,27 +96,39 @@ export default function TeacherTable({ teachers }: TeacherTableProps) {
       )}
 
       <Card sx={{
-        borderRadius: '12px',
+        borderRadius: '16px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        border: '1px solid rgba(255,255,255,0.5)',
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)',
+        border: '1px solid #E5E7EB',
+        background: '#FFFFFF',
         overflow: 'hidden',
       }}>
         {/* Header with Create Button */}
         <CardContent sx={{
-          background: '#ffffff',
-          borderBottom: '1px solid #e5e7eb',
-          p: 3,
+          background: 'linear-gradient(135deg, #F3E8FF 0%, #F5F3FF 100%)',
+          borderBottom: '2px solid #E9D5FF',
+          p: { xs: 2.5, sm: 3.5, lg: 4 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 2,
         }}>
           <Stack direction="row" alignItems="center" gap={2}>
-            <PersonIcon sx={{ fontSize: 32, color: '#667eea' }} />
+            <Box sx={{
+              w: 12,
+              h: 12,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+            }}>
+              <PersonIcon sx={{ fontSize: 28, color: 'white' }} />
+            </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#333' }}>Teacher Records</Typography>
-              <Typography variant="body2" sx={{ color: '#999', mt: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#1F2937', mb: 0.5 }}>Teacher Records</Typography>
+              <Typography variant="body2" sx={{ color: '#6B7280', fontWeight: 500 }}>
                 {teachers.length} total teacher{teachers.length !== 1 ? 's' : ''}
               </Typography>
             </Box>
@@ -126,15 +138,23 @@ export default function TeacherTable({ teachers }: TeacherTableProps) {
             startIcon={<PersonAddIcon />}
             onClick={() => router.push('/admin/teacher/create')}
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
               color: 'white',
               fontWeight: 600,
               textTransform: 'none',
               fontSize: '0.95rem',
               px: 3,
+              py: 1.3,
+              borderRadius: '10px',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+              whiteSpace: 'nowrap',
               '&:hover': {
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                boxShadow: '0 8px 25px rgba(139, 92, 246, 0.4)',
+                transform: 'translateY(-2px)',
+                background: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
               },
+              transition: 'all 0.3s ease',
             }}
           >
             + Create Teacher
@@ -143,44 +163,54 @@ export default function TeacherTable({ teachers }: TeacherTableProps) {
 
         {/* Table or Empty State */}
         {teachers.length === 0 ? (
-          <CardContent sx={{ p: 6, textAlign: 'center' }}>
-            <Box sx={{ mb: 2 }}>
-              <PersonIcon sx={{ fontSize: 60, color: '#ddd', mb: 1 }} />
+          <CardContent sx={{ p: 8, textAlign: 'center' }}>
+            <Box sx={{
+              background: 'linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%)',
+              borderRadius: '50%',
+              w: 24,
+              h: 24,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 3,
+            }}>
+              <PersonIcon sx={{ fontSize: 56, color: '#C4B5FD' }} />
             </Box>
-            <Typography variant="body1" sx={{ color: '#999', mb: 1 }}>No teacher accounts found</Typography>
-            <Typography variant="body2" sx={{ color: '#bbb' }}>Create your first teacher account above</Typography>
+            <Typography variant="body1" sx={{ color: '#6B7280', fontWeight: 600, mb: 1 }}>No teacher accounts found</Typography>
+            <Typography variant="body2" sx={{ color: '#9CA3AF' }}>Create your first teacher account above</Typography>
           </CardContent>
         ) : (
           <Box>
             <TableContainer>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                  <TableRow sx={{ backgroundColor: '#F9FAFB', borderBottom: '2px solid #8B5CF6' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       <Stack direction="row" alignItems="center" gap={1}>
                         <BadgeIcon sx={{ fontSize: 18 }} />
                         Employee ID
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       Full Name
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       <Stack direction="row" alignItems="center" gap={1}>
                         <SchoolIcon sx={{ fontSize: 18 }} />
                         Department
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       <Stack direction="row" alignItems="center" gap={1}>
                         <EmailIcon sx={{ fontSize: 18 }} />
                         Email
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       Status
                     </TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#667eea', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                    <TableCell align="right" sx={{ fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -190,24 +220,24 @@ export default function TeacherTable({ teachers }: TeacherTableProps) {
                     <TableRow
                       key={teacher.id}
                       sx={{
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                        backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F9FAFB',
                         '&:hover': {
-                          backgroundColor: '#f0f4ff',
+                          backgroundColor: '#F5F3FF',
                           transition: 'background-color 0.2s ease',
                         },
-                        borderBottom: '1px solid #e5e7eb',
+                        borderBottom: '1px solid #E5E7EB',
                       }}
                     >
-                      <TableCell sx={{ color: '#667eea', fontWeight: 600 }}>
-                        {teacher.employee_id || '-'}
+                      <TableCell sx={{ color: '#8B5CF6', fontWeight: 600 }}>
+                        {teacher.employee_id || 'N/A'}
                       </TableCell>
-                      <TableCell sx={{ color: '#333', fontWeight: 500 }}>
-                        {teacher.fullname || 'N/A'}
+                      <TableCell sx={{ color: '#1F2937', fontWeight: 500 }}>
+                        {teacher.fullname}
                       </TableCell>
-                      <TableCell sx={{ color: '#666' }}>
-                        {teacher.department || '-'}
+                      <TableCell sx={{ color: '#6B7280' }}>
+                        {teacher.department || 'N/A'}
                       </TableCell>
-                      <TableCell sx={{ color: '#666' }}>
+                      <TableCell sx={{ color: '#6B7280' }}>
                         {teacher.email || '-'}
                       </TableCell>
                       <TableCell>

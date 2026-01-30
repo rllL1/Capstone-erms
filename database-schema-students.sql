@@ -6,10 +6,22 @@
 CREATE TABLE IF NOT EXISTS groups (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    description TEXT,
+    year_level VARCHAR(100),
+    semester VARCHAR(100),
+    code VARCHAR(50) UNIQUE NOT NULL,
     teacher_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    student_count INTEGER DEFAULT 0,
+    material_count INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Indexes for groups
+CREATE INDEX IF NOT EXISTS idx_groups_teacher_id ON groups(teacher_id);
+CREATE INDEX IF NOT EXISTS idx_groups_code ON groups(code);
+
 -- ============================================
 
 -- ============================================
@@ -253,6 +265,7 @@ CREATE TRIGGER assign_letter_grade_trigger
 -- ============================================
 
 -- Enable RLS on tables
+ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE exam_grades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assessment_submissions ENABLE ROW LEVEL SECURITY;
@@ -291,6 +304,31 @@ CREATE POLICY "Teachers can view active students"
             WHERE id = auth.uid() AND role IN ('teacher', 'admin')
         )
     );
+
+-- Groups Table Policies
+CREATE POLICY "Teachers can create groups"
+    ON groups FOR INSERT
+    TO authenticated
+    WITH CHECK (teacher_id = auth.uid());
+
+CREATE POLICY "Teachers can view own groups"
+    ON groups FOR SELECT
+    TO authenticated
+    USING (teacher_id = auth.uid() OR EXISTS (
+        SELECT 1 FROM profiles
+        WHERE id = auth.uid() AND role = 'admin'
+    ));
+
+CREATE POLICY "Teachers can update own groups"
+    ON groups FOR UPDATE
+    TO authenticated
+    USING (teacher_id = auth.uid())
+    WITH CHECK (teacher_id = auth.uid());
+
+CREATE POLICY "Teachers can delete own groups"
+    ON groups FOR DELETE
+    TO authenticated
+    USING (teacher_id = auth.uid());
 
 -- Exam Grades Policies
 CREATE POLICY "Students can view their own exam grades"

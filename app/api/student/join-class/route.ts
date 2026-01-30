@@ -40,17 +40,63 @@ export async function POST(request: NextRequest) {
     }
 
     // Get join code
-    const { data: joinCode, error: codeError } = await supabase
+    const { data: joinCodeData, error: codeError } = await supabase
       .from('class_join_codes')
       .select('id, group_id, max_uses, current_uses, is_active, expires_at')
       .eq('code', code.toUpperCase())
       .single();
 
-    if (codeError || !joinCode) {
-      return NextResponse.json(
-        { error: 'Invalid code' },
-        { status: 400 }
-      );
+    console.log('Join code lookup:', { joinCodeData, codeError, code: code.toUpperCase() });
+
+    let joinCode = joinCodeData;
+
+    // If not found in class_join_codes, try groups table and create a join code
+    if (!joinCodeData) {
+      console.log('Join code not found, checking groups table...');
+      
+      const { data: groupData, error: groupError } = await supabase
+        .from('groups')
+        .select('id, teacher_id')
+        .eq('code', code.toUpperCase())
+        .single();
+
+      console.log('Groups table lookup:', { groupData, groupError });
+
+      if (!groupData) {
+        console.error('Code not found in either table during join:', code.toUpperCase());
+        return NextResponse.json(
+          { error: 'Invalid code' },
+          { status: 400 }
+        );
+      }
+
+      // Create join code for this group
+      console.log('Creating join code for group during join:', groupData.id);
+      
+      const { data: newJoinCode, error: createError } = await supabase
+        .from('class_join_codes')
+        .insert({
+          group_id: groupData.id,
+          code: code.toUpperCase(),
+          max_uses: -1,
+          current_uses: 0,
+          is_active: true,
+          created_by: groupData.teacher_id,
+        })
+        .select('id, group_id, max_uses, current_uses, is_active, expires_at')
+        .single();
+
+      console.log('Join code creation during join:', { newJoinCode, createError });
+
+      if (!newJoinCode) {
+        console.error('Failed to create join code during join:', createError);
+        return NextResponse.json(
+          { error: 'Invalid code' },
+          { status: 400 }
+        );
+      }
+
+      joinCode = newJoinCode;
     }
 
     // === Validation Checks (Re-validate before joining) ===

@@ -29,6 +29,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PeopleIcon from '@mui/icons-material/People';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -194,6 +195,7 @@ export default function TeacherLayout({
     { text: 'Examination', icon: <MenuBookIcon />, path: '/teacher/examination' },
     { text: 'Group', icon: <GroupsIcon />, path: '/teacher/group' },
     { text: 'Grades', icon: <AssessmentIcon />, path: '/teacher/grades' },
+    { text: 'Profile', icon: <AccountCircleIcon />, path: '/teacher/profile' },
   ];
 
   if (!mounted || loading) {

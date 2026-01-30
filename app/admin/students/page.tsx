@@ -103,18 +103,28 @@ export default function AdminStudentsPage() {
     <Box sx={{ minHeight: 'auto', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', p: 3 }}>
       {/* Header Section */}
       <Box sx={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '12px',
-        p: 3,
+        background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+        borderRadius: '16px',
+        p: { xs: 2, sm: 3, lg: 4 },
         mb: 4,
         color: 'white',
-        boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+        boxShadow: '0 8px 32px rgba(139, 92, 246, 0.4)',
       }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Stack direction="row" spacing={2} alignItems="center">
-            <PeopleIcon sx={{ fontSize: 40 }} />
+            <Box sx={{
+              background: 'rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              p: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <PeopleIcon sx={{ fontSize: { xs: 28, lg: 36 } }} />
+            </Box>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>Student Management</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, fontSize: { xs: '1.75rem', lg: '2.125rem' } }}>Student Management</Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>Manage and create student accounts</Typography>
             </Box>
           </Stack>
@@ -122,9 +132,9 @@ export default function AdminStudentsPage() {
             <IconButton
               aria-label="refresh"
               onClick={() => { setQuery(''); setSelectedCourse(''); setPage(1); router.refresh(); }}
-              sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}
+              sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)', transform: 'rotate(180deg)' }, transition: 'all 0.3s ease' }}
             >
-              <RefreshIcon />
+              <RefreshIcon sx={{ fontSize: { xs: 24, lg: 28 } }} />
             </IconButton>
           </Stack>
         </Stack>
@@ -152,11 +162,10 @@ export default function AdminStudentsPage() {
       {!loading && students && (
         <Card sx={{
           mb: 4,
-          borderRadius: '12px',
+          borderRadius: '16px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(255,255,255,0.5)',
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(10px)',
+          border: '1px solid #E5E7EB',
+          background: '#FFFFFF',
         }}>
           <CardContent>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
@@ -171,30 +180,44 @@ export default function AdminStudentsPage() {
                     minWidth: '240px',
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '8px',
-                    backgroundColor: '#f5f7fa',
+                    backgroundColor: '#F9FAFB',
+                    border: '1px solid #E5E7EB',
                     '&:hover fieldset': {
-                      borderColor: '#667eea',
+                      borderColor: '#8B5CF6',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#8B5CF6',
                     },
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: '#667eea' }} />
+                      <SearchIcon sx={{ color: '#8B5CF6' }} />
                     </InputAdornment>
                   ),
                 }}
               />
 
               <FormControl size="small" sx={{ minWidth: '200px', flex: 1 }}>
-                <InputLabel>Course</InputLabel>
+                <InputLabel sx={{ '&.Mui-focused': { color: '#8B5CF6' } }}>Course</InputLabel>
                 <Select
                   label="Course"
                   value={selectedCourse}
                   onChange={(e) => { setSelectedCourse(e.target.value); setPage(1); }}
                   sx={{
                     borderRadius: '8px',
-                    backgroundColor: '#f5f7fa',
+                    backgroundColor: '#F9FAFB',
+                    border: '1px solid #E5E7EB',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#E5E7EB',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#8B5CF6',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#8B5CF6',
+                    },
                   }}
                 >
                   <MenuItem value="">All Courses</MenuItem>
@@ -210,17 +233,17 @@ export default function AdminStudentsPage() {
                 variant="contained"
                 startIcon={<PersonAddIcon />}
                 sx={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
                   borderRadius: '8px',
                   px: 3,
                   py: 1.2,
                   fontWeight: 600,
                   textTransform: 'none',
                   fontSize: '0.95rem',
-                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                  boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
                   whiteSpace: 'nowrap',
                   '&:hover': {
-                    boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                    boxShadow: '0 6px 20px rgba(139, 92, 246, 0.6)',
                     transform: 'translateY(-2px)',
                   },
                   transition: 'all 0.3s ease',
@@ -241,12 +264,12 @@ export default function AdminStudentsPage() {
                 <Box sx={{ overflowX: 'auto' }}>
                   <Table>
                     <TableHead>
-                      <TableRow sx={{ backgroundColor: '#f5f7fa', borderBottom: '2px solid #667eea' }}>
-                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Student ID</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Full Name</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Course</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Email</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: '#667eea' }}>Status</TableCell>
+                      <TableRow sx={{ backgroundColor: '#F9FAFB', borderBottom: '2px solid #8B5CF6' }}>
+                        <TableCell sx={{ fontWeight: 700, color: '#8B5CF6' }}>Student ID</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#8B5CF6' }}>Full Name</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#8B5CF6' }}>Course</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#8B5CF6' }}>Email</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: '#8B5CF6' }}>Status</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -254,12 +277,12 @@ export default function AdminStudentsPage() {
                         <TableRow
                           key={s.id}
                           sx={{
-                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                            backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F9FAFB',
                             '&:hover': {
-                              backgroundColor: '#f0f4ff',
+                              backgroundColor: '#F5F3FF',
                               transition: 'all 0.2s ease',
                             },
-                            borderBottom: '1px solid #eee',
+                            borderBottom: '1px solid #E5E7EB',
                           }}
                         >
                           <TableCell sx={{ fontWeight: 600, color: '#333' }}>
@@ -268,17 +291,17 @@ export default function AdminStudentsPage() {
                               label={s.student_id}
                               variant="outlined"
                               size="small"
-                              sx={{ borderColor: '#667eea', color: '#667eea' }}
+                              sx={{ borderColor: '#8B5CF6', color: '#8B5CF6' }}
                             />
                           </TableCell>
-                          <TableCell sx={{ color: '#333', fontWeight: 500 }}>{s.fullname}</TableCell>
-                          <TableCell sx={{ color: '#666' }}>
-                            <Chip icon={<SchoolIcon />} label={s.course} size="small" variant="outlined" />
+                          <TableCell sx={{ color: '#1F2937', fontWeight: 500 }}>{s.fullname}</TableCell>
+                          <TableCell sx={{ color: '#6B7280' }}>
+                            <Chip icon={<SchoolIcon />} label={s.course} size="small" variant="outlined" sx={{ borderColor: '#E9D5FF', color: '#8B5CF6' }} />
                           </TableCell>
-                          <TableCell sx={{ color: '#666' }}>
+                          <TableCell sx={{ color: '#6B7280' }}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                              <EmailIcon sx={{ fontSize: 18, color: '#999' }} />
-                              <Typography variant="body2">{s.email}</Typography>
+                              <EmailIcon sx={{ fontSize: 18, color: '#9CA3AF' }} />
+                              <Typography variant="body2" sx={{ color: '#6B7280' }}>{s.email}</Typography>
                             </Stack>
                           </TableCell>
                           <TableCell>

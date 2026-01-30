@@ -1,4 +1,4 @@
-export type QuestionType = 'multiple_choice' | 'true_false' | 'identification' | 'essay';
+export type QuestionType = 'multiple_choice' | 'true_false' | 'identification' | 'enumeration' | 'essay' | 'short_answer';
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 export type AssessmentStatus = 'draft' | 'published' | 'archived';
 export type ExaminationStatus = 'pending' | 'approved' | 'rejected' | 'draft' | 'published' | 'archived';

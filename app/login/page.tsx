@@ -8,6 +8,8 @@ import { login } from './actions';
 import Modal from '@mui/material/Modal';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Alert from '@mui/material/Alert';
 
 // Unified login page for all roles
 
@@ -142,7 +144,9 @@ export default function LoginPage() {
         <div className="max-w-screen-2xl mx-auto w-full px-4 sm:px-8 md:px-12 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 lg:gap-20 items-center">
             {/* Left Section - Login Form */}
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full max-w-md mx-auto relative">
+              {/* Decorative violet background shape */}
+              <div className="absolute bottom-0 right-0 w-72 h-72 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full filter blur-3xl opacity-30 -z-10 transform translate-x-20 translate-y-32"></div>
               {/* Heading */}
               <div className="mb-8">
                 <h2 className="text-4xl font-bold text-gray-900 mb-3">Welcome Back</h2>
@@ -151,25 +155,78 @@ export default function LoginPage() {
 
               {/* Error Message */}
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                  {error}
+                </Alert>
               )}
 
-              {/* Unified Login Form for all roles */}
-              <form action={login} className="space-y-5">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input id="email" name="email" type="email" required className="w-full px-4 h-11 border border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all text-gray-900 placeholder-gray-400" placeholder="Enter your email" />
-                </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input id="password" name="password" type="password" required className="w-full px-4 h-11 border border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all text-gray-900 placeholder-gray-400" placeholder="Enter your password" />
-                </div>
-                <button type="submit" className="w-full h-11 bg-purple-400 hover:bg-purple-500 text-white font-medium rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                  Login
+              {/* Login Form */}
+              <Box
+                component="form"
+                action={login}
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: 2.5,
+                }}
+              >
+                <TextField
+                  fullWidth
+                  id="email-input"
+                  name="email"
+                  label="Email Address"
+                  variant="outlined"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#FFFFFF',
+                      '&:hover fieldset': { borderColor: '#8B5CF6' },
+                      '&.Mui-focused fieldset': { borderColor: '#8B5CF6', borderWidth: 2 },
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: '#6B7280',
+                      '&.Mui-focused': { color: '#8B5CF6' },
+                    },
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  id="password-input"
+                  name="password"
+                  label="Password"
+                  variant="outlined"
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#FFFFFF',
+                      '&:hover fieldset': { borderColor: '#8B5CF6' },
+                      '&.Mui-focused fieldset': { borderColor: '#8B5CF6', borderWidth: 2 },
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: '#6B7280',
+                      '&.Mui-focused': { color: '#8B5CF6' },
+                    },
+                  }}
+                />
+
+                <button 
+                  type="submit" 
+                  className="w-full h-11 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 mt-2"
+                >
+                  Sign In
                 </button>
-              </form>
+              </Box>
             </div>
 
             {/* Right Section - Illustration */}

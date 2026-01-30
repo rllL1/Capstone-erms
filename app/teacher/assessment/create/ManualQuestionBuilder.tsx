@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Question, QuestionType, DifficultyLevel, MultipleChoiceOption } from '@/types/assessment';
+import type { Question, QuestionType, DifficultyLevel } from '@/types/assessment';
 
 interface ManualQuestionBuilderProps {
   questions: Question[];
@@ -103,12 +103,13 @@ export default function ManualQuestionBuilder({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Question Type
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
               { value: 'multiple_choice', label: 'Multiple Choice' },
-              { value: 'true_false', label: 'True or False' },
+              { value: 'true_false', label: 'True/False' },
               { value: 'identification', label: 'Identification' },
-              { value: 'essay', label: 'Essay Writing' },
+              { value: 'enumeration', label: 'Enumeration' },
+              { value: 'essay', label: 'Essay' },
             ].map((type) => (
               <button
                 key={type.value}
@@ -119,7 +120,7 @@ export default function ManualQuestionBuilder({
                     options: type.value === 'multiple_choice' ? currentQuestion.options : undefined,
                   })
                 }
-                className={`px-4 py-3 rounded-lg border-2 font-medium transition-colors ${
+                className={`px-4 py-3 rounded-lg border-2 font-medium transition-colors text-sm ${
                   currentQuestion.type === type.value
                     ? 'border-green-600 bg-green-50 text-green-700'
                     : 'border-gray-200 text-gray-700 hover:border-gray-300'
@@ -263,10 +264,10 @@ export default function ManualQuestionBuilder({
           </div>
         )}
 
-        {(currentQuestion.type === 'identification' || currentQuestion.type === 'essay') && (
+        {(currentQuestion.type === 'identification' || currentQuestion.type === 'enumeration' || currentQuestion.type === 'essay' || currentQuestion.type === 'short_answer') && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sample Answer (Optional)
+              Sample Answer {currentQuestion.type === 'enumeration' && '(Separate items with commas)'}
             </label>
             <textarea
               value={currentQuestion.sampleAnswer || ''}
@@ -275,7 +276,11 @@ export default function ManualQuestionBuilder({
               }
               rows={3}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
-              placeholder="Provide a sample answer for reference..."
+              placeholder={
+                currentQuestion.type === 'enumeration'
+                  ? 'Item 1, Item 2, Item 3, ...'
+                  : 'Provide a sample answer for reference...'
+              }
             />
           </div>
         )}
@@ -341,7 +346,7 @@ export default function ManualQuestionBuilder({
           disabled={questions.length === 0}
           className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-medium rounded-lg transition-colors"
         >
-          Next: Settings
+          Next: Preview & Submit
         </button>
       </div>
     </div>

@@ -9,6 +9,7 @@ export default function CreateGroupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [groupCode, setGroupCode] = useState('');
+  const [error, setError] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -30,9 +31,10 @@ export default function CreateGroupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
     if (!groupCode) {
-      alert('Please generate a group code');
+      setError('Please generate a group code');
       return;
     }
 
@@ -43,7 +45,7 @@ export default function CreateGroupPage() {
     });
 
     if (result.error) {
-      alert(result.error);
+      setError(result.error);
       setLoading(false);
     } else {
       router.push('/teacher/group');
@@ -68,6 +70,13 @@ export default function CreateGroupPage() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 font-semibold">Error</p>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+            </div>
+          )}
+          
           {/* Group Name */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">

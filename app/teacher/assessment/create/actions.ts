@@ -92,8 +92,8 @@ ${contentToAnalyze}
 
 Return ONLY the JSON array, nothing else.`;
 
-    // Call Gemini API (using free tier model)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Call Gemini API (using free tier model - latest stable)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let generatedText = response.text();

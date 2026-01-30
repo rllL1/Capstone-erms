@@ -16,10 +16,10 @@ import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import { Person, Lock, CheckCircle } from '@mui/icons-material';
 
-export default function StudentProfilePage() {
+export default function TeacherProfilePage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [student, setStudent] = useState<{ user_id: string; fullname: string; email: string; student_id: string; course: string; status: string } | null>(null);
+  const [teacher, setTeacher] = useState<{ user_id: string; fullname: string; email: string; department: string; id: string } | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [form, setForm] = useState({ fullname: '', email: '', password: '', currentPassword: '' });
   const [passwordValidationError, setPasswordValidationError] = useState<string | null>(null);
@@ -42,32 +42,32 @@ export default function StudentProfilePage() {
 
         console.debug('Profile: User authenticated:', user.id);
 
-        // Fetch student data directly from Supabase
-        const { data: studentData, error: studentError } = await supabase
-          .from('students')
-          .select('user_id, fullname, email, student_id, course, status')
-          .eq('user_id', user.id)
+        // Fetch teacher data from profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, fullname, email, department')
+          .eq('id', user.id)
           .single();
 
-        if (studentError) {
-          console.error('Profile: Student query error:', studentError);
-          setMessage({ type: 'error', text: 'Unable to load profile. ' + (studentError.message || 'Student record not found.') });
+        if (profileError) {
+          console.error('Profile: Profile query error:', profileError);
+          setMessage({ type: 'error', text: 'Unable to load profile. ' + (profileError.message || 'Profile record not found.') });
           setLoading(false);
           return;
         }
 
-        if (!studentData) {
-          console.warn('Profile: No student record found');
-          setMessage({ type: 'error', text: 'Student record not found. Please contact support.' });
+        if (!profileData) {
+          console.warn('Profile: No profile record found');
+          setMessage({ type: 'error', text: 'Profile record not found. Please contact support.' });
           setLoading(false);
           return;
         }
 
-        console.debug('Profile: Student data loaded:', studentData.fullname);
-        setStudent(studentData);
+        console.debug('Profile: Teacher data loaded:', profileData.fullname);
+        setTeacher({ ...profileData, user_id: user.id });
         setForm({ 
-          fullname: studentData.fullname || '', 
-          email: studentData.email || '', 
+          fullname: profileData.fullname || '', 
+          email: profileData.email || '', 
           password: '', 
           currentPassword: '' 
         });
@@ -122,8 +122,8 @@ export default function StudentProfilePage() {
     setUpdating(true);
 
     try {
-      if (!student) {
-        setMessage({ type: 'error', text: 'No student loaded' });
+      if (!teacher) {
+        setMessage({ type: 'error', text: 'No teacher profile loaded' });
         setUpdating(false);
         return;
       }
@@ -154,35 +154,21 @@ export default function StudentProfilePage() {
       console.debug('Profile: Starting update for user:', user.id);
 
       // Update fullname and email if changed
-      if (form.fullname !== student.fullname || form.email !== student.email) {
+      if (form.fullname !== teacher.fullname || form.email !== teacher.email) {
         console.debug('Profile: Updating fullname and email');
         
         const { error: updateError } = await supabase
-          .from('students')
+          .from('profiles')
           .update({
             fullname: form.fullname,
             email: form.email,
             updated_at: new Date().toISOString(),
           })
-          .eq('user_id', student.user_id);
+          .eq('id', teacher.user_id);
 
         if (updateError) {
           console.error('Profile: Update error:', updateError);
           throw updateError;
-        }
-
-        // Also update profiles table if it exists
-        try {
-          await supabase
-            .from('profiles')
-            .update({
-              fullname: form.fullname,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', student.user_id);
-        } catch (err) {
-          console.warn('Profile: Could not update profiles table:', err);
-          // Don't fail if profiles table update fails
         }
       }
 
@@ -248,7 +234,7 @@ export default function StudentProfilePage() {
     );
   }
 
-  if (!student) {
+  if (!teacher) {
     return (
       <Container maxWidth="sm">
         <Box sx={{ pt: 4 }}>
@@ -292,7 +278,7 @@ export default function StudentProfilePage() {
             }}
           >
             <Person sx={{ fontSize: 32, background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} />
-            Student Profile
+            Teacher Profile
           </Typography>
           <Typography sx={{ color: '#7C3AED', fontSize: '0.95rem', fontWeight: 500, letterSpacing: '0.3px' }}>
             Manage your account information and security settings
@@ -317,9 +303,9 @@ export default function StudentProfilePage() {
           </Alert>
         )}
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
+        <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
           {/* Edit Profile Card */}
-          <Box sx={{ width: '100%', p: 0 }}>
+          <Grid item xs={12} sx={{ width: '100%', p: 0 }}>
             <Card 
               sx={{ 
                 height: '100%',
@@ -482,8 +468,8 @@ export default function StudentProfilePage() {
                 </Box>
               </CardContent>
             </Card>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       </Box>
     </Container>
   );
