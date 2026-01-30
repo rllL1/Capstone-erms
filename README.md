@@ -1,20 +1,57 @@
-# ERMS - Exam Records Management System
+# ERMS - Educational Record Management System
 
-A full-stack, role-based administrative system built with Next.js (App Router) and Supabase.
+A comprehensive, role-based educational platform built with Next.js 15 (App Router) and Supabase. Designed for admins, teachers, and students to manage classes, assessments, and academic records in a modern, intuitive interface.
 
 ## Tech Stack
 
-- **Next.js 15** (App Router) - Frontend & Backend
-- **Supabase** - Authentication & Database
-- **Tailwind CSS** - Styling (Green/Black/White theme)
+- **Next.js 15** (App Router, Turbopack) - Frontend & Backend
+- **Supabase** - Authentication & PostgreSQL Database
+- **Material-UI (MUI)** - Component library
+- **Tailwind CSS** - Styling with modern gradients
+- **TypeScript** - Type safety
 
 ## Features
 
-- 🔐 **Role-based Authentication** (Admin & Teacher)
-- 👥 **Admin Dashboard** - System overview and analytics
-- 📋 **Teacher Management** - Create, view, archive, and restore teacher accounts
-- 🛡️ **Route Protection** - Middleware-based access control
-- 🚫 **No Signup** - Only admins can create accounts
+### 🔐 Authentication & Security
+- Role-based authentication (Admin, Teacher, Student)
+- Server-side session validation
+- Protected routes with middleware
+- Secure credential management
+- Password change functionality for all users
+
+### 👨‍💼 Admin Dashboard
+- System overview with comprehensive statistics
+- Teacher management (create, view, archive, restore)
+- Student management and enrollment
+- Dashboard analytics with real-time data
+- Modern gradient UI design
+
+### 👨‍🏫 Teacher Portal
+- Personal dashboard with class and assessment overview
+- Create and manage classes with unique join codes
+- Student group management
+- Assessment creation (manual and AI-assisted)
+- Grade management and computation
+- Class performance tracking
+- Personal profile management
+- Student activity monitoring
+
+### 👨‍🎓 Student Portal
+- Join classes using teacher-generated codes
+- Personal dashboard with class overview
+- View grades and assessment submissions
+- Track learning progress
+- Performance analytics
+- Personal profile management
+- Submit assessments and view feedback
+
+### 📚 Core Features
+- Class join codes for seamless enrollment
+- Assessment management and grading
+- Group-based learning
+- Material sharing within classes
+- Real-time activity feeds
+- Responsive mobile-first design
 
 ## Getting Started
 
@@ -74,58 +111,172 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ```
 ├── app/
-│   ├── login/              # Login page & actions
-│   ├── admin/              # Admin dashboard
-│   │   ├── layout.tsx      # Admin layout with sidebar
-│   │   ├── dashboard/      # Dashboard overview
-│   │   └── teacher/        # Teacher management
-│   └── teacher/            # Teacher portal
-│       ├── layout.tsx      # Teacher layout
-│       └── dashboard/      # Teacher dashboard
+│   ├── login/                   # Unified login page with violet accent
+│   ├── admin/                   # Admin portal
+│   │   ├── layout.tsx           # Admin layout with sidebar
+│   │   ├── dashboard/           # System overview & analytics
+│   │   ├── teacher/             # Teacher management
+│   │   └── students/            # Student management
+│   ├── teacher/                 # Teacher portal
+│   │   ├── layout.tsx           # Teacher layout with navigation
+│   │   ├── profile/             # Teacher profile & credentials
+│   │   ├── dashboard/           # Teacher dashboard
+│   │   ├── assessment/          # Assessment creation & grading
+│   │   ├── class/               # Class management
+│   │   ├── group/               # Student group management
+│   │   └── grades/              # Grade management
+│   ├── student/                 # Student portal
+│   │   ├── layout.tsx           # Student layout
+│   │   ├── profile/             # Student profile
+│   │   ├── dashboard/           # Student dashboard
+│   │   ├── class/               # Class view & join
+│   │   ├── grades/              # View grades
+│   │   └── performance/         # Performance tracking
+│   └── api/                     # API routes
+│       ├── auth/                # Authentication endpoints
+│       ├── admin/               # Admin API routes
+│       ├── teacher/             # Teacher API routes
+│       └── student/             # Student API routes
 ├── lib/
-│   └── supabase/           # Supabase client utilities
+│   └── supabase/                # Supabase client utilities
 ├── types/
-│   └── database.ts         # TypeScript types
-├── middleware.ts           # Route protection
-└── supabase/
-    └── schema.sql          # Database schema
+│   ├── database.ts              # Database type definitions
+│   └── assessment.ts            # Assessment types
+├── middleware.ts                # Route protection & validation
+└── migrations/                  # Database migrations
 ```
 
 ## User Roles
 
 ### Admin
 - Access to `/admin/*` routes
-- Can view system statistics
-- Can create teacher accounts
-- Can archive/restore teachers
+- View comprehensive system statistics and analytics
+- Create, manage, and archive teacher accounts
+- View all students and manage enrollments
+- System-wide dashboard with activity feeds
+- Real-time utilization metrics
 
 ### Teacher
 - Access to `/teacher/*` routes
-- Can view their own profile
-- Cannot create or manage accounts
+- Create and manage classes with join codes
+- Create and grade assessments (manual or AI-assisted)
+- Manage student groups and materials
+- View class performance and analytics
+- Manage personal profile and credentials
+- Generate class join codes for student enrollment
+
+### Student
+- Access to `/student/*` routes
+- Join classes using teacher-provided codes
+- View enrolled classes and course materials
+- Submit assessments and view grades
+- Track personal learning progress
+- View performance analytics
+- Manage personal profile and credentials
 
 ## Security
 
-- All sensitive operations run server-side
-- Service Role Key is server-only
-- Middleware validates sessions and roles
-- Archived users are blocked from logging in
-- Row Level Security enabled on database
+- ✅ All sensitive operations run server-side
+- ✅ Service Role Key is server-only (never exposed to client)
+- ✅ Middleware validates sessions and roles before route access
+- ✅ Archived users are blocked from logging in
+- ✅ Row Level Security (RLS) enabled on all database tables
+- ✅ Type-safe database queries with TypeScript
+- ✅ Secure password hashing and validation
+- ✅ Session expiration and re-authentication
 
 ## Database Schema
 
-### profiles table
+### Core Tables
 
+#### profiles table
 | Column | Type | Description |
 |--------|------|-------------|
 | id | UUID | Primary key (matches auth.users.id) |
-| role | TEXT | 'admin' or 'teacher' |
+| role | TEXT | 'admin', 'teacher', or 'student' |
 | fullname | TEXT | User's full name |
-| employee_id | TEXT | Unique employee identifier |
-| department | TEXT | Department name |
+| email | TEXT | User email |
 | status | TEXT | 'active' or 'archived' |
 | created_at | TIMESTAMP | Account creation date |
+
+#### groups table (Classes)
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| teacher_id | UUID | Teacher who created the group |
+| name | TEXT | Class/group name |
+| code | TEXT | Unique class code |
+| description | TEXT | Class description |
+| created_at | TIMESTAMP | Creation date |
+
+#### class_join_codes table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| group_id | UUID | Reference to groups |
+| code | TEXT | Unique join code |
+| max_uses | INT | Maximum uses (-1 = unlimited) |
+| current_uses | INT | Current usage count |
+| is_active | BOOLEAN | Whether code is active |
+| expires_at | TIMESTAMP | Expiration date |
+
+#### assessments table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| group_id | UUID | Associated class |
+| teacher_id | UUID | Creating teacher |
+| title | TEXT | Assessment title |
+| description | TEXT | Assessment details |
+| status | TEXT | 'draft', 'published', 'graded' |
+| created_at | TIMESTAMP | Creation date |
+
+#### group_members table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| group_id | UUID | Class reference |
+| student_id | UUID | Student reference |
+| status | TEXT | 'active' or 'inactive' |
+| joined_at | TIMESTAMP | Enrollment date |
 
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
+
+### Deployment Checklist
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel project settings:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+4. Deploy and verify all routes work correctly
+
+## Troubleshooting
+
+### Login Issues
+- Clear browser cache and cookies
+- Verify Supabase credentials in `.env.local`
+- Check user status is 'active' (not 'archived')
+
+### Database Connection Errors
+- Verify Supabase URL and API keys are correct
+- Check network connectivity
+- Ensure RLS policies are properly configured
+
+### Missing Features
+- Run database migrations from `/migrations` folder
+- Verify all tables exist in Supabase
+- Check for any pending schema updates
+
+## Contributing
+
+1. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Push to the branch (`git push origin feature/amazing-feature`)
+4. Open a Pull Request
+
+## License
+
+This project is proprietary and confidential.
